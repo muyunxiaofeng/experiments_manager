@@ -24,11 +24,20 @@
 
 在应用离群检验法时，需要根据具体的数据集和分析目的选择合适的离群检验方法。同时，还需要确定适当的临界值或显著性水平，以确保检验结果的准确性和可靠性。
 
+离群检验法是一种统计方法，用于确定一个数据集中的异常值。这些异常值可能由各种因素引起，例如测量错误、数据收集错误、数据传输错误等。离群检验法可以帮助我们识别和处理这些异常值，以避免其对数据分析产生负面影响。
+
+以下是常见的离群检验法：
+
+1. 肖维勒法：根据测定次数n查肖维勒系数表值ω(n)，当ωn>ω(n)，判定为异常值，否则未发现异常值。
+2. t检验法：其中s和x¯都是由不包括离群值的n- 1个数据计算所得。查t检验的临界值表值kP(n)，当kn>kP(n)，判定为异常值，否则未发现异常值。
+3. 格鲁布斯法：查格鲁布斯检验的临界值表值GP(n)，当Gn>GP(n)，判定为异常值，否则未发现异常值。
+4. 狄克逊法：此法由Dixon在1950年提出，它的原理是通过离群值与临近值的差值与极差的比值这一统计量rij来判断是否存在异常值。确定检出水平α，查狄克逊检验的临界值表值DP(n)。
+
+在应用离群检验法时，需要根据具体的数据集和分析目的选择合适的离群检验方法。同时，还需要确定适当的临界值或显著性水平，以确保检验结果的准确性和可靠性。
+
+
+
 #### 格鲁布斯法
-
-
-
-
 
 格鲁布斯法是一种用于判断一组数据中可疑值的取舍的方法，常用于化学数据分析。
 
@@ -187,6 +196,12 @@ for i in range(len(z_scores)):
 ```
 在上面的示例中，首先计算了四分位数范围（IQR）和Z-score。然后根据格鲁布斯临界值表中的值，通过Z-score的绝对值与临界值的比较，判断异常值。最后将异常值存储在outliers列表中。
 
+格鲁布斯法（Grubbs' test）的公式为：T = |X - μ| / S，其中X为可疑数据，μ为数据集的平均值，S为标准差。
+
+格鲁布斯法的目的是为了检测数据集中的异常值。根据这个公式，如果可疑数据与数据集平均值的差异超过标准差的某个临界值，那么就认为这个数据是异常值。具体来说，这个临界值可以根据显著性水平α来确定。例如，对于α=0.05，可以查Grubbs检验的临界值表得到临界值GP(n)，当Gn>GP(n)，判定为异常值，否则未发现异常值。
+
+以上信息仅供参考，如果还有疑问，建议查阅统计学专业书籍或咨询专业人士。
+
 
 
 #### 狄克逊法
@@ -262,3 +277,34 @@ Tags（标签）：
 ————————————————
 版权声明：本文为CSDN博主「Lntano__y」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 原文链接：https://blog.csdn.net/m0_49133355/article/details/131221005
+
+```shell
+Last login: Sun Nov  5 15:18:51 on ttys001
+frozensword@192 ~ % /Users/frozensword/Downloads/ffmpeg ; exit;
+ffmpeg version N-112441-gc06d3d2404-tessus  https://evermeet.cx/ffmpeg/  Copyright (c) 2000-2023 the FFmpeg developers
+  built with Apple clang version 11.0.0 (clang-1100.0.33.17)
+  configuration: --cc=/usr/bin/clang --prefix=/opt/ffmpeg --extra-version=tessus --enable-avisynth --enable-fontconfig --enable-gpl --enable-libaom --enable-libass --enable-libbluray --enable-libdav1d --enable-libfreetype --enable-libgsm --enable-libmodplug --enable-libmp3lame --enable-libmysofa --enable-libopencore-amrnb --enable-libopencore-amrwb --enable-libopenh264 --enable-libopenjpeg --enable-libopus --enable-librubberband --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libtheora --enable-libtwolame --enable-libvidstab --enable-libvmaf --enable-libvo-amrwbenc --enable-libvorbis --enable-libvpx --enable-libwebp --enable-libx264 --enable-libx265 --enable-libxavs --enable-libxml2 --enable-libxvid --enable-libzimg --enable-libzmq --enable-libzvbi --enable-version3 --pkg-config-flags=--static --disable-ffplay
+  libavutil      58. 27.100 / 58. 27.100
+  libavcodec     60. 30.102 / 60. 30.102
+  libavformat    60. 15.100 / 60. 15.100
+  libavdevice    60.  2.101 / 60.  2.101
+  libavfilter     9. 11.100 /  9. 11.100
+  libswscale      7.  4.100 /  7.  4.100
+  libswresample   4. 11.100 /  4. 11.100
+  libpostproc    57.  2.100 / 57.  2.100
+Hyper fast Audio and Video encoder
+usage: ffmpeg [options] [[infile options] -i infile]... {[outfile options] outfile}...
+
+Use -h to get full help or, even better, run 'man ffmpeg'
+
+Saving session...
+...copying shared history...
+...saving history...truncating history files...
+...completed.
+Deleting expired sessions...none found.
+
+[进程已完成]
+
+
+```
+
