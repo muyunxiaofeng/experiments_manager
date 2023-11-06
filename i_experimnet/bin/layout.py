@@ -19,5 +19,8 @@ layout	文件名
 
 class Layout:
     def __init__(self):
+        self.layout  = self.layout()
         pass
+
+    def layout():
 

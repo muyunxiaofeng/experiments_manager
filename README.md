@@ -1,6 +1,18 @@
 # experiments_manager
  生物实验的管理
 
+# 依赖包
+
+pip install pandas
+
+pip install numpy
+
+pip install matplotlib
+
+pip install scipy
+
+
+
 # 功能汇总
 
 1. 实现对多组数据的的离散型筛选的功能
