@@ -3,6 +3,56 @@
 
 # 依赖包
 
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+
+清华 
+
+```
+pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+腾讯
+
+```
+pip config set global.index-url http://mirrors.cloud.tencent.com/pypi/simple
+```
+
+阿里
+
+```
+pip config set global.index-url https://mirrors.aliyun.com/pypi/simple/
+```
+
+临时下载
+
+```
+pip install pandas -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+离线安装
+
+```
+pip install xxx.whl
+pyhton setup.py install
+1.
+也可直接使用pip
+
+pip install xxx.tar.gz
+检查
+
+可以使用 pip list 查看第三方库是否安装完毕。
+当我们拿到一个项目时，首先要在项目运行环境安装 requirement.txt 所包含的依赖：
+
+pip install -r requirement.txt
+1.
+当我们要把环境中的依赖写入 requirement.txt 中时，可以借助 freeze 命令：
+
+pip freeze >requirements.txt
+```
+
+## 目前依赖包
+
+```shell
 pip install pandas
 
 pip install numpy
@@ -10,6 +60,7 @@ pip install numpy
 pip install matplotlib
 
 pip install scipy
+```
 
 
 

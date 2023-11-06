@@ -15,12 +15,19 @@ layout	文件名
 04	当前分钟
 59	当前秒钟
 """
+import numpy as np
 
 
 class Layout:
     def __init__(self):
-        self.layout  = self.layout()
+        self.layout = self.layout()
         pass
 
-    def layout():
-
+    def layout(self):
+        while 1:
+            _input = input("请输入要选择的序号，只输入Q退出：").strip()
+            if not _input:
+                print("不能输入空值~")
+                continue
+            if _input.upper() == "Q":
+                return
