@@ -53,6 +53,9 @@ pip freeze >requirements.txt
 ## 目前依赖包
 
 ```shell
+
+pip install pipreqs
+
 pip install pandas
 
 pip install numpy
@@ -62,7 +65,7 @@ pip install matplotlib
 pip install scipy
 ```
 
-
+pipreqs D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\support\  --encoding=utf-8 --force
 
 # 功能汇总
 
