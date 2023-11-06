@@ -262,3 +262,51 @@ Tags（标签）：
 ————————————————
 版权声明：本文为CSDN博主「Lntano__y」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 原文链接：https://blog.csdn.net/m0_49133355/article/details/131221005
+
+
+
+# 2023.11.06
+
+## 线性回归
+
+首先，我们需要使用Python中的NumPy和matplotlib库来绘制线性回归曲线，然后使用sympy库来计算线性回归公式的系数。
+
+以下是一个示例代码：
+
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from sympy import symbols, Eq, solve
+
+# 定义x和y
+x = np.array([1, 2, 3, 4, 5])
+y = np.array([2, 4, 5, 4, 5])
+
+# 定义x和y的变量
+x, y = symbols('x y')
+
+# 建立线性回归方程
+eq = Eq(y, 2*x + 1)
+
+# 使用solve解方程，得到系数
+coef = solve(eq, y)[0]
+
+# 进行线性回归拟合，得到拟合曲线的数据
+x_fit = np.linspace(np.min(x), np.max(x), 100)
+y_fit = coef[0]*x_fit + coef[1]
+
+# 绘制原始数据点
+plt.scatter(x, y, color='blue', label='Data points')
+
+# 绘制拟合曲线
+plt.plot(x_fit, y_fit, color='red', label='Fitted line')
+
+# 在图上添加公式
+plt.text(0.5, 0.9, r'y = {:.2f}x + {:.2f}'.format(coef[0], coef[1]), ha='center', va='center', transform=plt.gca().transAxes)
+
+# 显示图形和图例
+plt.legend()
+plt.show()
+```
+在这个示例中，我们首先定义了x和y的数据点，然后使用sympy库中的symbols函数定义了x和y的变量，并建立了线性回归方程。我们使用solve函数解方程，得到了线性回归公式的系数。接下来，我们使用NumPy库中的linspace函数生成了一组拟合曲线的数据点，并使用matplotlib库中的scatter函数绘制了原始数据点，以及使用plot函数绘制了拟合曲线。最后，我们使用text函数在图上添加了线性回归公式。
