@@ -18,7 +18,23 @@ some_count	文件名
 import string
 
 
-def row(num, outline=""):
+def upper_row(num, outline=""):
+    if num == 0:
+        raise Exception
+
+        # print(len(string.ascii_lowercase)) # 26
+    div, mod = divmod(num - 1, len(string.ascii_uppercase))
+
+    outline += string.ascii_uppercase[mod]
+    while div > 26:
+        upper_row(div, outline)
+    else:
+        if div != 0:
+            outline += string.ascii_uppercase[div - 1]
+    return outline[::-1]
+
+
+def lower_row(num, outline=""):
     if num == 0:
         raise Exception
 
@@ -27,7 +43,7 @@ def row(num, outline=""):
 
     outline += string.ascii_lowercase[mod]
     while div > 26:
-        row(div, outline)
+        lower_row(div, outline)
     else:
         if div != 0:
             outline += string.ascii_lowercase[div - 1]
