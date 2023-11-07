@@ -24,7 +24,12 @@ class TestLayout(TestCase):
 
     def test_layout_init(self):
         self.layout = Layout()
-        self.layout.layout_init()
-        pprint(self.layout.template_plate)
-        pprint(self.layout.current_plate)
-        pprint(self.layout.template_plate.to_dict())
+
+        self.layout.area_split("a1-a5")
+
+
+
+        # self.layout.layout_init()
+        # pprint(self.layout.template_plate)
+        # pprint(self.layout.current_plate)
+        # pprint(self.layout.template_plate.to_dict())

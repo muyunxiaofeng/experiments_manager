@@ -18,6 +18,7 @@ layout_init 初始化布板方法
 
 """
 import math
+import re
 import string
 import numpy as np
 import pandas as pd
@@ -63,7 +64,7 @@ class Layout:
         # 转化成dataframe
         self.current_plate = pd.DataFrame(self.current_plate, index=row_num, columns=col_num)
         self.template_plate = pd.DataFrame(self.template_plate, index=row_num, columns=col_num)
-
+        self.template_plate.loc()
         """
         初始化结果
              1   2   3   4   5   6   7   8   9    10   11   12
@@ -114,3 +115,17 @@ class Layout:
             area_list = _input.split(";")
 
             return
+
+    def area_split(self, area):
+        if "-" in area:
+            position_start, position_end = area.split("-")
+            print(position_start)
+            # 获取字母部分
+            position_start_alpha = re.findall("[a-z]*", position_start.lower())
+            # 获取数字部分
+            position_start_digit = re.findall("\d*", position_start)
+            # 获取字母部分
+            position_end_alpha = re.findall("[a-z]*", position_end.lower())
+            # 获取数字部分
+            position_end_digit = re.findall("\d*", position_end)
+            print(position_start_alpha, position_start_digit, position_end_alpha, position_end_digit)

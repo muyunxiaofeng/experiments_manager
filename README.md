@@ -331,9 +331,9 @@ Tags（标签）：
 
 
 
-# 2023.11.06
+## 2023.11.06
 
-## 线性回归
+### 线性回归
 
 首先，我们需要使用Python中的NumPy和matplotlib库来绘制线性回归曲线，然后使用sympy库来计算线性回归公式的系数。
 
@@ -376,3 +376,171 @@ plt.legend()
 plt.show()
 ```
 在这个示例中，我们首先定义了x和y的数据点，然后使用sympy库中的symbols函数定义了x和y的变量，并建立了线性回归方程。我们使用solve函数解方程，得到了线性回归公式的系数。接下来，我们使用NumPy库中的linspace函数生成了一组拟合曲线的数据点，并使用matplotlib库中的scatter函数绘制了原始数据点，以及使用plot函数绘制了拟合曲线。最后，我们使用text函数在图上添加了线性回归公式。
+
+
+
+## 2023.11.07
+
+### DataFrame是Pandas中的主要数据结构之一，本篇博客主要介绍如何DataFrame中某一列的值进行修改。
+
+1 常规方法
+  这部分主要介绍修改DataFrame列值的常规方法。为了方便后续说明先构建如下数据：
+
+import pandas as pd
+import numpy as np
+df=pd.DataFrame([['A',1],['B',2],['C',5],['D',4],['E',10],['F',13],['G',8]],
+                columns=['col_1','col_2'],
+                index=list('abcdefg'))
+
+```
+import pandas as pd
+import numpy as np
+df=pd.DataFrame([['A',1],['B',2],['C',5],['D',4],['E',10],['F',13],['G',8]],
+                columns=['col_1','col_2'],
+                index=list('abcdefg'))
+
+```
+
+
+df结果如下：
+
+![在这里插入图片描述](assets/d2480541e275442690659fde4f7b9cad.png)
+
+使用常量修改DataFrame列的值
+使用一个常量对DataFrame列中的数据进行修改时，代码举例如下：
+
+```
+df1=df.copy()
+df1['col_1']='H'
+df1.loc[['a','c','d'],'col_2']=100 #将指定索引的列值进行修改
+df1.iloc[4:,-1]=200 
+```
+
+
+df1的结果如下：
+
+![在这里插入图片描述](assets/5b37c71308074e6795cbbf55be86b0e6.png)
+
+
+使用List\array修改DataFrame列的值
+当需要对DataFrame列中的多个值进行修改时，可以使用List或array等变量型数据来对其进行修改。具体代码如下：
+
+```
+df2=df.copy()
+df2['col_1']=list(range(7))
+df2.loc[df2.index<='d','col_2']=np.array([15,20,25,30])
+df2.iloc[4:,-1]=np.array([10,5,0])
+```
+
+
+df2的结果如下：
+
+![在这里插入图片描述](assets/2fd25760e5ef4d158b7a82145487c30a.png)
+
+使用Series/DataFrame修改DataFrame列的值
+除了以上两种数据类型之外，还可以使用Series型数据来修改DataFrame列的值。但使用这种方法时，**需要索引对齐，否则会出错**。具体举例如下：
+
+```
+df3=df.copy()
+df3['col_1']=pd.Series([1,2,3,4,5,6,7]) #索引不对齐时不会报错，但没有成功修改列值。
+df3.loc[['a','b','c'],'col_2']=pd.Series([100,200,300],index=list('abc'))
+df3.iloc[3:,-1]=pd.DataFrame([[4000],[5000],[6000],[7000]],index=list('cdef'))
+```
+
+
+其结果如下：
+
+![在这里插入图片描述](assets/88886bc23336426d81f9e77af99a05f3.png)
+
+
+2. replace方法
+  DataFrame对象自带的方法replace()也可以实现列值的修改。该方法中的参数主要有以下几个：
+
+
+
+| **参数**   | **作用**                                                     |
+| ---------- | ------------------------------------------------------------ |
+| to_replace | 确定需要修改列值的数据。可接受的数据类型有：str, regex, list, dict, Series, int, float, or None |
+| value      | 指定修改后的值。可接受的数据类型有：scalar, dict, list, str, regex, default None |
+| inplace    | 是否本地置换                                                 |
+| limit      | 指定前后填充的最大次数                                       |
+| regex      | 正则表达式符号。如果需要在to_replace中使用字符串形式的正则表达式对数据进行筛选的话，需要将其设置为True。 |
+| method     | 填充方式。‘pad’, ‘ffill’, ‘bfill’, None                      |
+
+参数	作用
+to_replace	确定需要修改列值的数据。可接受的数据类型有：str, regex, list, dict, Series, int, float, or None
+value	指定修改后的值。可接受的数据类型有：scalar, dict, list, str, regex, default None
+inplace	是否本地置换
+limit	指定前后填充的最大次数
+regex	正则表达式符号。如果需要在to_replace中使用字符串形式的正则表达式对数据进行筛选的话，需要将其设置为True。
+method	填充方式。‘pad’, ‘ffill’, ‘bfill’, None
+————————————————
+版权声明：本文为CSDN博主「Sun_Sherry」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/yeshang_lady/article/details/127619031
+
+
+
+参数	作用
+to_replace	确定需要修改列值的数据。可接受的数据类型有：str, regex, list, dict, Series, int, float, or None
+value	指定修改后的值。可接受的数据类型有：scalar, dict, list, str, regex, default None
+inplace	是否本地置换
+limit	指定前后填充的最大次数
+regex	正则表达式符号。如果需要在to_replace中使用字符串形式的正则表达式对数据进行筛选的话，需要将其设置为True。
+method	填充方式。‘pad’, ‘ffill’, ‘bfill’, None
+创建如下数据，具体如下：
+
+```
+df=pd.DataFrame([['A','A'],['B','B'],['C',5],['D',4]],
+                columns=['col_1','col_2'],
+                index=list('abcd'))
+```
+
+
+df的结果如下：
+
+![在这里插入图片描述](assets/a8e7f4c2a51c4c4caf21ca024caaead5.png)
+
+对整个DataFrame中的指定数据进行替换
+
+```
+#A替换为aaa,B替换为bbb,4替换为100
+df_1=df.replace(to_replace=['A','B',4],value=['aaa','bbb',100])
+#将A替换为AAAA
+df_2=df.replace(to_replace='A',value='AAAA')
+#将A替换为AAAAA,5替换为2000
+df_3=df.replace(to_replace={"A":'AAAAA',5:2000})
+```
+
+
+其结果如下：
+
+![在这里插入图片描述](assets/c6fd8590162b4a769c0397e0fd18e38e.png)
+
+对DataFrame中的不同列指定不同的替换方式
+
+```
+#对于col_1列：将A替换为1，B替换为2
+#对于col_2列：将A替换为100，B替换为200
+df_4=df.replace({"col_1":{'A':1,'B':2},"col_2":{"A":100,"B":200}})
+```
+
+
+其结果如下：
+
+![在这里插入图片描述](assets/1a4c92861095443cbaab142b87f5d789.png)
+
+使用正则表达式筛选数据
+
+```
+#将A\B替换成new
+df_5=df.replace(to_replace=r'[AB]',value='new',regex=True)
+```
+
+
+其结果如下：
+
+![在这里插入图片描述](assets/3442b68795fd4112be6b646a8f58cdfc.png)
+
+————————————————
+版权声明：本文为CSDN博主「Sun_Sherry」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/yeshang_lady/article/details/127619031
