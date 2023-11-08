@@ -28,6 +28,7 @@ from i_experimnet.utils import some_count
 
 class Layout:
     def __init__(self, plate=96):
+        self.unit = None
         self.plate = plate
         self.template_plate = []
         self.current_plate = []
@@ -96,14 +97,13 @@ class Layout:
     def layout(self):
         self.help_layout()
 
-    @staticmethod
-    def help_layout():
+    def help_layout(self):
         """
         根据输入的布板信息进行
         :return:
         """
         while 1:
-            print("例：", "a1-a3,a4,a5=0;b12=1000;(fg/mL)")
+            print("例：", "a1-a3,a4,a5=0;b12=1000;(fg/mL);^curve=a1-h6;^sample=a7-h7,a7-h12")
             _input = input("请输入位置信息，用区域间用分号隔开，只输入Q退出：").strip()
             if not _input:
                 print("不能输入空值~")
@@ -111,8 +111,32 @@ class Layout:
 
             if _input.upper() == "Q":
                 return
+            # 根据键入的内容分成不同的等式列表
+            area_equation_list = _input.split(";")
+            # 遍历等式进行分拣
+            for area_equation in area_equation_list:
+                # 单位unit 处理
+                if "(" in area_equation:
+                    self.unit = re.findall("\((.*/.*)\)", area_equation)
+                    # todo 进行所有试验孔的单位分配  但是现在可能没有处理完布板信息 所以要在最后 放置一个end_layout 完成这个功能
+                # 布板信息的基础内容
+                # 等式左边为区域 区域列表  右侧为  值  不含单位
+                elif "=" in area_equation:
+                    area, area_value = area_equation.split("=")
+                    sub_area_list = area.split(",")
+                    for sub_area in sub_area_list:
+                        pass
 
-            area_list = _input.split(";")
+                elif "^" in area_equation:
+                    if "curve" in area_equation.lower():
+                        # todo curve
+                        pass
+                    elif "sample" in area_equation.lower():
+                        # todo sample
+                        pass
+                elif "{" in area_equation:
+                    # todo 这里是要调取布板信息的
+                    pass
 
             return
 
@@ -121,11 +145,16 @@ class Layout:
             position_start, position_end = area.split("-")
             print(position_start)
             # 获取字母部分
-            position_start_alpha = re.findall("[a-z]*", position_start.lower())
+            position_start_alpha = re.findall("([a-z]*)\d*", position_start.lower())[0]
             # 获取数字部分
-            position_start_digit = re.findall("\d*", position_start)
+            position_start_digit = re.findall("[a-z]*(\d*)", position_start)[0]
             # 获取字母部分
-            position_end_alpha = re.findall("[a-z]*", position_end.lower())
+            position_end_alpha = re.findall("([a-z]*)\d*", position_end.lower())[0]
             # 获取数字部分
-            position_end_digit = re.findall("\d*", position_end)
+            position_end_digit = re.findall("[a-z]*(\d*)", position_end)[0]
             print(position_start_alpha, position_start_digit, position_end_alpha, position_end_digit)
+        else:
+            # 获取字母部分
+            position_alpha = re.findall("([a-z]*)\d*", area.lower())[0]
+            # 获取数字部分
+            position_digit = re.findall("[a-z]*(\d*)", area.lower())[0]

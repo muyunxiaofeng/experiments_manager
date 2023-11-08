@@ -15,6 +15,7 @@ test_layout	文件名
 35	当前分钟
 56	当前秒钟
 """
+import re
 from pprint import pprint
 from unittest import TestCase
 from i_experimnet.bin.layout import Layout
@@ -25,9 +26,9 @@ class TestLayout(TestCase):
     def test_layout_init(self):
         self.layout = Layout()
 
-        self.layout.area_split("a1-a5")
-
-
+        self.layout.area_split("aaaa1-abbbb5")
+        area_equation = "(fg/mL)"
+        print(re.findall("\((.*/.*)\)", area_equation))
 
         # self.layout.layout_init()
         # pprint(self.layout.template_plate)
