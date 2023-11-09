@@ -544,3 +544,137 @@ df_5=df.replace(to_replace=r'[AB]',value='new',regex=True)
 ————————————————
 版权声明：本文为CSDN博主「Sun_Sherry」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 原文链接：https://blog.csdn.net/yeshang_lady/article/details/127619031
+
+## 2023.11.09
+
+在Python中实现离群点检测的方法有很多种，下面我简单介绍几种常见的方法：
+
+1. **Z-Score方法**：这种方法是通过计算每个数据点与平均值的差值，再除以标准差。然后根据z-score的绝对值是否超过某个阈值来判断是否为离群点。
+
+
+```python
+import numpy as np
+
+def z_score(data):
+    return (data - np.mean(data)) / np.std(data)
+
+# 假设data是我们需要检查的数据集
+outliers = np.abs(z_score(data)) > 3
+```
+2. **IQR方法**：四分位距方法（IQR）是通过计算数据的下四分位数（Q1）和上四分位数（Q3），然后计算IQR，即Q3 - Q1。离群点被定义为小于Q1 - 1.5 * IQR或大于Q3 + 1.5 * IQR的数据点。
+
+
+```python
+import numpy as np
+
+def iqr(data):
+    data_sorted = np.sort(data)
+    q25, q75 = np.percentile(data_sorted, 25), np.percentile(data_sorted, 75)
+    iqr = q75 - q25
+    lower, upper = q25 - 1.5 * iqr, q75 + 1.5 * iqr
+    return (data < upper) & (data > lower)
+
+# 假设data是我们需要检查的数据集
+outliers = iqr(data)
+```
+3. **基于统计的方法**：这种方法是使用一些统计测试（例如卡方检验、威尔科克森符号检验等）来检测离群点。这种方法通常需要更复杂的计算，但可以提供更准确的离群点检测。例如使用Shapiro-Wilk测试检查数据是否符合正态分布，然后使用z-score方法找出离群点。
+4. **使用机器学习方法**：一些机器学习算法（例如孤立森林方法）也可以用来检测离群点。这种方法通常需要更多的计算资源，但可以更准确地找到离群点。例如使用Isolation Forest方法。
+
+以上都是简单介绍，每种方法都有其优缺点和适用场景，需要根据具体情况选择合适的方法。
+
+
+
+```python
+class Data_washing:
+    def __init__(self, data=None):
+        self.origin_data = None
+        self.washed_data = None
+        self.washed_method = None
+
+    def iqr(self):
+        data = self.origin_data
+        # 排序序列
+        data_sorted = np.sort(data)
+        q25, q75 = np.percentile(data_sorted, 25), np.percentile(data_sorted, 75)
+        iqr = q75 - q25
+        lower, upper = q25 - 1.5 * iqr, q75 + 1.5 * iqr
+        self.washed_method = inspect.currentframe().f_code.co_name
+        return lower < data < upper
+from i_experimnet.utils.data_wash.data_washing import Data_washing
+
+from unittest import TestCase
+
+
+class TestData_washing(TestCase):
+    def test_iqr(self):
+        li = [1, 2, 3, 4, 5, 6, 7, 8]
+        dw = Data_washing(data=li)
+        print(dw.iqr())
+Ran 1 test in 0.007s
+
+FAILED (errors=1)
+
+Error
+Traceback (most recent call last):
+  File "D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\utils\data_wash\test_data_washing.py", line 27, in test_iqr
+    print(dw.iqr())
+          ^^^^^^^^
+  File "D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\utils\data_wash\data_washing.py", line 35, in iqr
+    data_sorted = np.sort(data)
+                  ^^^^^^^^^^^^^
+  File "C:\Users\41379\experiments_manager\Lib\site-packages\numpy\core\fromnumeric.py", line 1017, in sort
+    a.sort(axis=axis, kind=kind, order=order)
+numpy.exceptions.AxisError: axis -1 is out of bounds for array of dimension 0
+```
+
+
+
+从错误信息来看，问题出在`np.sort(data)`这一行代码。错误是`numpy.exceptions.AxisError: axis -1 is out of bounds for array of dimension 0`，这表明你试图在不存在的轴上对数组进行排序。
+
+你的`iqr`方法试图对`self.origin_data`进行排序，但根据错误信息，`self.origin_data`的维度为0，也就是说它可能不是一个二维或更高维度的数组，无法进行排序。
+
+一个可能的解决方案是确保你在调用`np.sort(data)`之前检查`data`的维度。如果`data`是一个0维数组，那么你可能需要直接返回`data`，而不是尝试对它进行排序。你可以使用以下代码：
+
+
+```python
+class Data_washing:
+    def __init__(self, data=None):
+        self.origin_data = None
+        self.washed_data = None
+        self.washed_method = None
+
+    def iqr(self):
+        data = self.origin_data
+        if len(data.shape) == 0:  # if data is a scalar
+            return data < np.percentile(data, 25) and data > np.percentile(data, 75)
+        else:  # if data is an array
+            data_sorted = np.sort(data)
+            q25, q75 = np.percentile(data_sorted, 25), np.percentile(data_sorted, 75)
+            iqr = q75 - q25
+            lower, upper = q25 - 1.5 * iqr, q75 + 1.5 * iqr
+            self.washed_method = inspect.currentframe().f_code.co_name
+            return lower < data < upper
+```
+这样，当`self.origin_data`是一个标量时，它会返回一个布尔值，表示该标量是否在25%和75%的分位数之间。当`self.origin_data`是一个数组时，它将按照预期的方式进行排序并计算IQR。
+
+
+
+
+
+在Python中，我们可以使用内建函数`type()`来判断一个变量的类型。例如：
+
+
+```python
+x = 5
+print(type(x))  # 输出: <class 'int'>
+```
+在这个例子中，`type(x)`返回的是`<class 'int'>`，这表示`x`是一个整数类型。
+
+另一个常见的内建函数是`isinstance()`，这个函数可以检查一个对象是否是一个给定的类型。例如：
+
+
+```python
+x = 5
+print(isinstance(x, int))  # 输出: True
+```
+在这个例子中，`isinstance(x, int)`返回`True`，这表示`x`确实是一个整数类型。

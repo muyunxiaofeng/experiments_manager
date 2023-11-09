@@ -15,17 +15,27 @@ some_count	文件名
 35	当前分钟
 28	当前秒钟
 """
+import math
 import string
 
 
 def upper_row(num, outline=""):
-    if num == 0:
+    """
+    一个26进制的字母排序 等同于excel的列名 列名都用的大写字母
+    :param num: 列的个数
+    :param outline: 输出的列名的倒置
+    :return: 输出的列名
+    """
+    # 不存在小于1的列
+    if num <= 0:
         raise Exception
-
-        # print(len(string.ascii_lowercase)) # 26
+    else:
+        num = math.ceil(num)
+    # 本位为mod  下一位的计算div递归给自己
     div, mod = divmod(num - 1, len(string.ascii_uppercase))
-
+    # 本位计算出的数值储存在outline中
     outline += string.ascii_uppercase[mod]
+    # 计算下一位
     while div > 26:
         upper_row(div, outline)
     else:
@@ -35,13 +45,22 @@ def upper_row(num, outline=""):
 
 
 def lower_row(num, outline=""):
-    if num == 0:
+    """
+    一个26进制的字母排序 等同于excel的列名 列名都用的小写字母
+    :param num: 列的个数
+    :param outline: 输出的列名的倒置
+    :return: 输出的列名
+    """
+    # 不存在小于1的列
+    if num <= 0:
         raise Exception
-
-        # print(len(string.ascii_lowercase)) # 26
+    else:
+        num = math.ceil(num)
+    # 本位为mod  下一位的计算div递归给自己
     div, mod = divmod(num - 1, len(string.ascii_lowercase))
-
+    # 本位计算出的数值储存在outline中
     outline += string.ascii_lowercase[mod]
+    # 计算下一位
     while div > 26:
         lower_row(div, outline)
     else:

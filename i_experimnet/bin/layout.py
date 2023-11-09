@@ -23,7 +23,7 @@ import string
 import numpy as np
 import pandas as pd
 
-from i_experimnet.utils import some_count
+from i_experimnet.utils import plate_number
 
 
 class Layout:

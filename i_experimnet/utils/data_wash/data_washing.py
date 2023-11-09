@@ -18,10 +18,28 @@ data_washing	文件名
 对于多组数据的处理的类：
 1. 离散型数值的清理
 """
+import inspect
+
+import numpy as np
 
 
 class Data_washing:
-    def __init__(self):
-        pass
+    def __init__(self, data=None):
+        self.origin_data = data
+        self.washed_data = None
+        self.washed_method = None
 
-    
+    def iqr(self):
+        data = self.origin_data
+        if type(data) = list
+        data = np.array(data)
+
+        if len(data.shape) == 0:  # if data is a scalar
+            return np.percentile(data, 75) > data > np.percentile(data, 25)
+        else:  # if data is an array
+            data_sorted = np.sort(data)
+            q25, q75 = np.percentile(data_sorted, 25), np.percentile(data_sorted, 75)
+            iqr = q75 - q25
+            lower, upper = q25 - 1.5 * iqr, q75 + 1.5 * iqr
+            self.washed_method = inspect.currentframe().f_code.co_name
+            return lower < data < upper
