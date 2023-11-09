@@ -173,6 +173,12 @@ class Layout:
             }
 
     def set_value(self, sub_area, area_value):
+        """
+
+        :param sub_area:
+        :param area_value:
+        :return:
+        """
         self.modify_plate = self.current_plate.copy()
         self.modify_plate = pd.DataFrame()
         # 分割区域
@@ -183,17 +189,26 @@ class Layout:
             self.current_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]] = area_value
             # 获取位置信息
             coordinates = self.template_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]]
-            # 构建 json
-            # 获取 modify 的值
-            mj = self.modify_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]]
-            # 无论是不是空值都扔进去
-            jb = Json_Bean(mj)
-            # 赋值位置信息和值
-            jb.input_para(var_name="position", var_value=coordinates)
-            jb.input_para(var_value="value", var_name=area_value)
-            # 将处理后的值赋回去
-            self.modify_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]] = jb.json_bean()
+            params_dict = {
+                "position": coordinates,
+                "value": area_value
+            }
+            self.change_modify_plate(row=area_dict["position_alpha"], col=area_dict["position_digit"],
+                                     params_dict=params_dict)
 
         else:
             # 区域赋值
             pass
+
+    def change_modify_plate(self, row, col, params_dict: dict, **kwargs):
+        # 构建 json,
+        # 获取 modify 的值
+        mj = self.modify_plate.loc[row, col]
+        # 无论是不是空值都扔进去
+        jb = Json_Bean(mj)
+        # 赋值位置信息和值
+        for param in params_dict:
+            jb.input_para(var_name=param, var_value=params_dict[param])
+
+        # 将处理后的值赋回去
+        self.modify_plate.loc[row, col] = jb.json_bean()

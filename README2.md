@@ -661,7 +661,7 @@ class Data_washing:
 
 
 
-在Python中，我们可以使用内建函数`type()`来判断一个变量的类型。例如：
+### 在Python中，我们可以使用内建函数`type()`来判断一个变量的类型。例如：
 
 
 ```python
@@ -670,7 +670,7 @@ print(type(x))  # 输出: <class 'int'>
 ```
 在这个例子中，`type(x)`返回的是`<class 'int'>`，这表示`x`是一个整数类型。
 
-另一个常见的内建函数是`isinstance()`，这个函数可以检查一个对象是否是一个给定的类型。例如：
+### 另一个常见的内建函数是`isinstance()`，这个函数可以检查一个对象是否是一个给定的类型。例如：
 
 
 ```python
@@ -678,3 +678,55 @@ x = 5
 print(isinstance(x, int))  # 输出: True
 ```
 在这个例子中，`isinstance(x, int)`返回`True`，这表示`x`确实是一个整数类型。
+
+### 在将DataFrame转化为一维表后，你可以使用`.values`属性或者直接进行索引来取值。
+
+如果你想获取整个一维表的值，你可以使用`.values`属性。例如：
+
+
+```python
+one_dim_df = df.stack()
+values = one_dim_df.values
+print(values)
+```
+这将输出一个二维的NumPy数组，其中包含了整个一维表的值。
+
+### 如果你只想获取一维表中特定位置的值，你可以直接使用索引。例如：
+
+
+```python
+# 获取索引为(1, 'A')的元素
+value = one_dim_df[1]['A']
+print(value)  # 输出：2
+```
+这里，我们使用了中括号表示法来索引特定的行和列。在这个例子中，我们获取了索引为1的行中'A'列的值。
+
+### 如果你想将一维表转换为列表形式，并且去掉索引，你可以使用`.tolist()`方法。例如：
+
+
+```python
+one_dim_df = df.stack()
+list_form = one_dim_df.tolist()
+print(list_form)
+```
+这将输出一个列表，其中包含了整个一维表的值，但没有索引。每个元素都是一个包含行标签、列标签和值的元组。如果你只想获取特定位置的值，你可以直接索引列表。例如：
+
+
+```python
+# 获取索引为1的元素
+value = list_form[1]
+print(value)  # 输出：(1, 'A', 2)
+```
+这里，我们获取了索引为1的元素，它是一个包含行标签、列标签和值的元组。
+
+### 如果你想将一维表转换为字典形式，你可以使用`.to_dict()`方法。
+
+默认情况下，这将返回一个字典，其中行标签为键，列标签为值的键值对。如果你想去掉索引，你可以将`exclude`参数设置为`index`。例如：
+
+
+```python
+one_dim_df = df.stack()
+dict_form = one_dim_df.to_dict(exclude=['index'])
+print(dict_form)
+```
+这将输出一个字典，其中包含了行标签和列标签对应的值，但没有索引。每个键都是一个元组，包含行标签和列标签。你可以根据需要进一步处理这个字典，比如将其转换为其他数据类型。
