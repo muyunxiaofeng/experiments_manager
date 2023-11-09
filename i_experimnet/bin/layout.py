@@ -128,7 +128,7 @@ class Layout:
                     sub_area_list = area.split(",")
                     # 遍历列表进行处理
                     for sub_area in sub_area_list:
-                        set_value
+                        self.set_value(sub_area, area_value)
 
                 elif "^" in area_equation:
                     if "curve" in area_equation.lower():
@@ -155,9 +155,31 @@ class Layout:
             position_end_alpha = re.findall("([a-z]*)\d*", position_end.lower())[0]
             # 获取数字部分
             position_end_digit = re.findall("[a-z]*(\d*)", position_end)[0]
-            print(position_start_alpha, position_start_digit, position_end_alpha, position_end_digit)
+            return {
+                "position_start_alpha": position_start_alpha,
+                "position_start_digit": position_start_digit,
+                "position_end_alpha": position_end_alpha,
+                "position_end_digit": position_end_digit
+            }
         else:
             # 获取字母部分
             position_alpha = re.findall("([a-z]*)\d*", area.lower())[0]
             # 获取数字部分
             position_digit = re.findall("[a-z]*(\d*)", area.lower())[0]
+            return {
+                "position_alpha": position_alpha,
+                "position_digit": position_digit
+            }
+
+    def set_value(self, sub_area, area_value):
+        modify_plate = self.template_plate
+        modify_plate = pd.DataFrame()
+        # modify_plate.loc
+        # 分割区域
+        area_dict = self.area_split(sub_area)
+        if len(area_dict) == 2:
+            # 单点赋值
+            pass
+        else:
+            # 区域赋值
+            pass
