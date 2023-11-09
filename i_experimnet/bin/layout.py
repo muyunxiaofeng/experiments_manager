@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 
 from i_experimnet.utils import plate_number
+from i_experimnet.src.bean.json_bean import Json_Bean
 
 
 class Layout:
@@ -172,14 +173,27 @@ class Layout:
             }
 
     def set_value(self, sub_area, area_value):
-        modify_plate = self.template_plate
-        modify_plate = pd.DataFrame()
-        # modify_plate.loc
+        self.modify_plate = self.current_plate.copy()
+        self.modify_plate = pd.DataFrame()
         # 分割区域
         area_dict = self.area_split(sub_area)
         if len(area_dict) == 2:
             # 单点赋值
-            pass
+            # 呈现结果赋值
+            self.current_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]] = area_value
+            # 获取位置信息
+            coordinates = self.template_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]]
+            # 构建 json
+            # 获取 modify 的值
+            mj = self.modify_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]]
+            # 无论是不是空值都扔进去
+            jb = Json_Bean(mj)
+            # 赋值位置信息和值
+            jb.input_para(var_name="position", var_value=coordinates)
+            jb.input_para(var_value="value", var_name=area_value)
+            # 将处理后的值赋回去
+            self.modify_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]] = jb.json_bean()
+
         else:
             # 区域赋值
             pass
