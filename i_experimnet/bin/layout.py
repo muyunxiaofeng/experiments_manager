@@ -122,10 +122,13 @@ class Layout:
                 # 布板信息的基础内容
                 # 等式左边为区域 区域列表  右侧为  值  不含单位
                 elif "=" in area_equation:
+                    # 将赋值部分进行处理
                     area, area_value = area_equation.split("=")
+                    # [] 列表化
                     sub_area_list = area.split(",")
+                    # 遍历列表进行处理
                     for sub_area in sub_area_list:
-                        pass
+                        set_value
 
                 elif "^" in area_equation:
                     if "curve" in area_equation.lower():

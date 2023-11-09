@@ -44,3 +44,4 @@ col(26 * 2)
 col(26 * 2 + 2)
 col_num = [col(index) for index in range(1, 13)]
 print(col_num)
+print("jhgjhg".split(","))
