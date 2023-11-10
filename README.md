@@ -661,7 +661,7 @@ class Data_washing:
 
 
 
-在Python中，我们可以使用内建函数`type()`来判断一个变量的类型。例如：
+### 在Python中，我们可以使用内建函数`type()`来判断一个变量的类型。例如：
 
 
 ```python
@@ -670,7 +670,7 @@ print(type(x))  # 输出: <class 'int'>
 ```
 在这个例子中，`type(x)`返回的是`<class 'int'>`，这表示`x`是一个整数类型。
 
-另一个常见的内建函数是`isinstance()`，这个函数可以检查一个对象是否是一个给定的类型。例如：
+### 另一个常见的内建函数是`isinstance()`，这个函数可以检查一个对象是否是一个给定的类型。例如：
 
 
 ```python
@@ -678,3 +678,228 @@ x = 5
 print(isinstance(x, int))  # 输出: True
 ```
 在这个例子中，`isinstance(x, int)`返回`True`，这表示`x`确实是一个整数类型。
+
+### 在 Pandas 中，你可以通过多种方式从 DataFrame 中获取值。以下是一些基本示例：
+
+1. **使用索引**：如果你有一个行索引，你可以直接从 DataFrame 中获取那一行的数据。例如：
+
+
+```python
+import pandas as pd
+
+# 创建一个 DataFrame
+df = pd.DataFrame({
+    'A': [1, 2, 3],
+    'B': [4, 5, 6],
+    'C': [7, 8, 9]
+}, index=['a', 'b', 'c'])
+
+# 获取索引 'b' 的行
+row = df.loc['b']
+print(row)
+```
+这将输出：
+
+
+```css
+A    2
+B    5
+C    8
+Name: b, dtype: int64
+```
+2. **使用列名**：如果你有一个列名，你可以直接从 DataFrame 中获取那一列的数据。例如：
+
+
+```python
+# 获取列 'A' 的数据
+column = df['A']
+print(column)
+```
+这将输出：
+
+
+```css
+a    1
+b    2
+c    3
+Name: A, dtype: int64
+```
+3. **使用布尔索引**：你可以使用一个布尔数组来选择 DataFrame 中的行或列。例如：
+
+
+```python
+# 选择所有 'A' 值大于 1 的行
+mask = df['A'] > 1
+selected_rows = df[mask]
+print(selected_rows)
+```
+这将输出：
+
+
+```css
+A  B  C
+b  2  5  8
+c  3  6  9
+```
+4. **使用高级索引**：你可以使用更复杂的方式选择 DataFrame 中的数据，例如使用列表、数组或字典。例如：
+
+
+```python
+# 选择 'A' 列中值大于 1 的行，并且 'B' 列中值小于 5 的行
+mask = (df['A'] > 1) & (df['B'] < 5)
+selected_rows = df[mask]
+print(selected_rows)
+```
+这将输出：
+
+
+```css
+A  B  C
+b  2  4  6
+```
+
+### 在Python的pandas库中，你可以使用索引来从DataFrame中取出特定的行和列。
+
+如果你想取出某一行的数据，你可以使用`.loc`属性，它允许你通过行标签来索引行。例如：
+
+
+```python
+import pandas as pd
+
+# 创建一个简单的DataFrame
+df = pd.DataFrame({
+    'A': [1, 2, 3],
+    'B': [4, 5, 6],
+    'C': [7, 8, 9]
+}, index=['a', 'b', 'c'])
+
+# 使用.loc取出索引为'b'的行
+row = df.loc['b']
+print(row)
+```
+这将输出：
+
+
+```css
+A    2
+B    5
+C    8
+Name: b, dtype: int64
+```
+如果你想取出某一列的数据，你可以直接使用列的名字来索引列。例如：
+
+
+```python
+# 取出列'A'的数据
+column = df['A']
+print(column)
+```
+这将输出：
+
+
+```css
+a    1
+b    2
+c    3
+Name: A, dtype: int64
+```
+如果你想取出多个行的数据，你可以提供一个包含所有行标签的列表，并用逗号分隔。例如：
+
+
+```python
+# 取出索引为'a'和'b'的行
+rows = df.loc[['a', 'b']]
+print(rows)
+```
+这将输出：
+
+
+```css
+A  B  C
+a  1  4  7
+b  2  5  8
+```
+
+### 在Pandas库中，你可以使用`stack()`函数将DataFrame从二维表转化为一维表。下面是一个例子：
+
+
+```python
+import pandas as pd
+
+# 创建一个简单的DataFrame
+df = pd.DataFrame({
+    'A': [1, 2, 3],
+    'B': [4, 5, 6],
+    'C': [7, 8, 9]
+}, index=['a', 'b', 'c'])
+
+# 使用stack()函数将DataFrame转化为一维表
+one_dim_df = df.stack()
+print(one_dim_df)
+```
+这将会输出以下内容：
+
+
+```python
+a  A    1
+   B    4
+   C    7
+b  A    2
+   B    5
+   C    8
+c  A    3
+   B    6
+   C    9
+dtype: int64
+```
+在这个结果中，你可以看到原来的二维表已经被转化为一维表，每个元素的索引由原来的行标签和列标签组成。
+
+在将DataFrame转化为一维表后，你可以使用`.values`属性或者直接进行索引来取值。
+
+如果你想获取整个一维表的值，你可以使用`.values`属性。例如：
+
+
+```python
+one_dim_df = df.stack()
+values = one_dim_df.values
+print(values)
+```
+这将输出一个二维的NumPy数组，其中包含了整个一维表的值。
+
+如果你只想获取一维表中特定位置的值，你可以直接使用索引。例如：
+
+
+```python
+# 获取索引为(1, 'A')的元素
+value = one_dim_df[1]['A']
+print(value)  # 输出：2
+```
+### 这里，我们使用了中括号表示法来索引特定的行和列。在这个例子中，我们获取了索引为1的行中'A'列的值。如果你想将一维表转换为列表形式，并且去掉索引，你可以使用`.tolist()`方法。例如：
+
+
+```python
+one_dim_df = df.stack()
+list_form = one_dim_df.tolist()
+print(list_form)
+```
+这将输出一个列表，其中包含了整个一维表的值，但没有索引。每个元素都是一个包含行标签、列标签和值的元组。如果你只想获取特定位置的值，你可以直接索引列表。例如：
+
+
+```python
+# 获取索引为1的元素
+value = list_form[1]
+print(value)  # 输出：(1, 'A', 2)
+```
+这里，我们获取了索引为1的元素，它是一个包含行标签、列标签和值的元组。
+
+### 如果你想将一维表转换为字典形式，你可以使用`.to_dict()`方法。
+
+默认情况下，这将返回一个字典，其中行标签为键，列标签为值的键值对。如果你想去掉索引，你可以将`exclude`参数设置为`index`。例如：
+
+
+```python
+one_dim_df = df.stack()
+dict_form = one_dim_df.to_dict(exclude=['index'])
+print(dict_form)
+```
+这将输出一个字典，其中包含了行标签和列标签对应的值，但没有索引。每个键都是一个元组，包含行标签和列标签。你可以根据需要进一步处理这个字典，比如将其转换为其他数据类型。
