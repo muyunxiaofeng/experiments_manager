@@ -31,9 +31,8 @@ class Data_washing:
 
     def iqr(self):
         data = self.origin_data
-        if type(data) = list
-        data = np.array(data)
-
+        if isinstance(data, list):
+            data = np.array(data)
         if len(data.shape) == 0:  # if data is a scalar
             return np.percentile(data, 75) > data > np.percentile(data, 25)
         else:  # if data is an array
