@@ -189,6 +189,7 @@ class Layout:
             self.current_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]] = area_value
             # 获取位置信息
             coordinates = self.template_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]]
+            # todo 将参数字典抽出来放在 config 中
             params_dict = {
                 "position": coordinates,
                 "value": area_value
