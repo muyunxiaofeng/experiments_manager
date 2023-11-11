@@ -69,9 +69,13 @@ pipreqs D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\support\  --e
 
 # 功能汇总
 
+## bin
+
 1. 实现对多组数据的的离散型筛选的功能
 
+## utils
 
+​	1.完成字母转换为数字的方法alpha_calculator 【2023.11.11】：直接输入字符串即可，如果非英文字母，则会报错！算出来是跟excel列名一致的结果。
 
 # 更新日志
 
@@ -903,3 +907,52 @@ dict_form = one_dim_df.to_dict(exclude=['index'])
 print(dict_form)
 ```
 这将输出一个字典，其中包含了行标签和列标签对应的值，但没有索引。每个键都是一个元组，包含行标签和列标签。你可以根据需要进一步处理这个字典，比如将其转换为其他数据类型。
+
+## 2023.11.11
+
+### 拿到一块dataframe的例子
+
+好的，以下是一个例子，假设你有一个名为`df`的DataFrame，其中包含以下数据：
+
+
+```
+A B C D
+a 1 2 3 4
+b 5 6 7 8
+c 9 10 11 12
+d 13 14 15 16
+```
+如果你想选择第一列到第三列的数据，你可以使用`.loc`属性，如下所示：
+
+
+```python
+selected_data = df.loc[:, :3]
+print(selected_data)
+```
+这将输出一个新的DataFrame，其中只包含第一列到第三列的数据：
+
+
+```css
+A B C
+a 1 2 3
+b 5 6 7
+c 9 10 11
+d 13 14 15
+```
+如果你想选择第二行到第四行、第一列到第三列的数据，你可以使用`.loc`属性，如下所示：
+
+
+```python
+selected_data = df.loc[2:, :3]
+print(selected_data)
+```
+这将输出一个新的DataFrame，其中包含了第二行到第四行、第一列到第三列的数据：
+
+
+```css
+A B C
+c 9 10 11
+d 13 14 15
+```
+
+### 完成字母转换为数字的方法alpha_calculator
