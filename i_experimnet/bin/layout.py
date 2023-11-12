@@ -24,21 +24,15 @@ import numpy as np
 import pandas as pd
 
 from i_experimnet.utils import plate_number
-from i_experimnet.config.layout_config import Layout_config
 from i_experimnet.src.bean.json_bean import Json_Bean
 
 
 class Layout:
     def __init__(self, plate=96):
-        # 一些字符串参数
-        self._config = Layout_config()
         self.unit = None
         self.plate = plate
         self.template_plate = []
         self.current_plate = []
-
-    def layout(self):
-        self.help_layout()
 
     def layout_init(self):
         """
@@ -47,18 +41,18 @@ class Layout:
         """
         # 根据不同的版型选择不同的布板位置
         match self.plate:
-            case self._config.asc_96:
-                row = self._config.asc_96_row
-                col = self._config.asc_96_col
-            case self._config.des_96:
-                row = self._config.des_96_row
-                col = self._config.des_96_col
-            case self._config.asc_12:
-                row = self._config.asc_12_row
-                col = self._config.asc_12_col
+            case 96:
+                row = 8
+                col = 12
+            case "96T":
+                row = 12
+                col = 8
+            case 12:
+                row = 4
+                col = 3
             case _:
-                row = self._config.default_row
-                col = math.ceil(self.plate / self._config.default_row)
+                row = 8
+                col = math.ceil(self.plate / 8)
         # 根据不同的布板位置生成【行坐标】和【纵坐标】
         row_num = [some_count.upper_row(index) for index in range(1, row + 1)]
         col_num = list(range(1, col + 1))
@@ -72,6 +66,7 @@ class Layout:
         # 转化成dataframe
         self.current_plate = pd.DataFrame(self.current_plate, index=row_num, columns=col_num)
         self.template_plate = pd.DataFrame(self.template_plate, index=row_num, columns=col_num)
+        self.template_plate.loc()
         """
         初始化结果
              1   2   3   4   5   6   7   8   9    10   11   12
@@ -100,13 +95,16 @@ class Layout:
                 
         """
 
+    def layout(self):
+        self.help_layout()
+
     def help_layout(self):
         """
         根据输入的布板信息进行
         :return:
         """
         while 1:
-            print("例：", "a1-a3,a4,a5=0;b12=1000;(fg/mL);^curve=a1-h6;^sample=a7-h7,a7-h12;{1}=a1-h2")
+            print("例：", "a1-a3,a4,a5=0;b12=1000;(fg/mL);^curve=a1-h6;^sample=a7-h7,a7-h12")
             _input = input("请输入位置信息，用区域间用分号隔开，只输入Q退出：").strip()
             if not _input:
                 print("不能输入空值~")
@@ -151,27 +149,27 @@ class Layout:
             position_start, position_end = area.split("-")
             print(position_start)
             # 获取字母部分
-            position_start_alpha = re.findall(self._config.re_alpha, position_start.lower())[0]
+            position_start_alpha = re.findall("([a-z]*)\d*", position_start.lower())[0]
             # 获取数字部分
-            position_start_digit = re.findall(self._config.re_digit, position_start)[0]
+            position_start_digit = re.findall("[a-z]*(\d*)", position_start)[0]
             # 获取字母部分
-            position_end_alpha = re.findall(self._config.re_alpha, position_end.lower())[0]
+            position_end_alpha = re.findall("([a-z]*)\d*", position_end.lower())[0]
             # 获取数字部分
-            position_end_digit = re.findall(self._config.re_digit, position_end)[0]
+            position_end_digit = re.findall("[a-z]*(\d*)", position_end)[0]
             return {
-                self._config.position_start_alpha: position_start_alpha,
-                self._config.position_start_digit: position_start_digit,
-                self._config.position_end_alpha: position_end_alpha,
-                self._config.position_end_digit: position_end_digit
+                "position_start_alpha": position_start_alpha,
+                "position_start_digit": position_start_digit,
+                "position_end_alpha": position_end_alpha,
+                "position_end_digit": position_end_digit
             }
         else:
             # 获取字母部分
-            position_alpha = re.findall(self._config.re_alpha, area.lower())[0]
+            position_alpha = re.findall("([a-z]*)\d*", area.lower())[0]
             # 获取数字部分
-            position_digit = re.findall(self._config.re_digit, area.lower())[0]
+            position_digit = re.findall("[a-z]*(\d*)", area.lower())[0]
             return {
-                self._config.position_alpha: position_alpha,
-                self._config.position_digit: position_digit
+                "position_alpha": position_alpha,
+                "position_digit": position_digit
             }
 
     def set_value(self, sub_area, area_value):
@@ -188,45 +186,20 @@ class Layout:
         if len(area_dict) == 2:
             # 单点赋值
             # 呈现结果赋值
-            self.current_plate.loc[
-                area_dict[self._config.position_alpha], area_dict[self._config.position_digit]] = area_value
+            self.current_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]] = area_value
             # 获取位置信息
-            coordinates = self.template_plate.loc[
-                area_dict[self._config.position_alpha], area_dict[self._config.position_digit]]
+            coordinates = self.template_plate.loc[area_dict["position_alpha"], area_dict["position_digit"]]
+            # todo 将参数字典抽出来放在 config 中
             params_dict = {
-                self._config.params_position: coordinates,
-                self._config.params_value: area_value
+                "position": coordinates,
+                "value": area_value
             }
-            self.change_modify_plate(row=area_dict[self._config.position_alpha],
-                                     col=area_dict[self._config.position_digit],
+            self.change_modify_plate(row=area_dict["position_alpha"], col=area_dict["position_digit"],
                                      params_dict=params_dict)
+
         else:
             # 区域赋值
-            if area_dict[self._config.position_start_alpha] == area_dict[self._config.position_end_alpha]:
-                if area_dict[self._config.position_start_digit] == area_dict[self._config.position_end_digit]:
-                    # 神经病级别的单点赋值而已 所以代码同单点赋值
-                    # 呈现结果赋值
-                    self.current_plate.loc[
-                        area_dict[self._config.position_start_alpha],
-                        area_dict[self._config.position_start_digit]] = area_value
-                    # 获取位置信息
-                    coordinates = self.template_plate.loc[
-                        area_dict[self._config.position_start_alpha],
-                        area_dict[self._config.position_start_digit]]
-                    params_dict = {
-                        self._config.params_position: coordinates,
-                        self._config.params_value: area_value
-                    }
-                    # 真实布板的赋值
-                    self.change_modify_plate(
-                        row=area_dict[self._config.position_start_alpha],
-                        col=area_dict[self._config.position_start_digit],
-                        params_dict=params_dict
-                    )
-                else:
-                    # 对一行进行赋值  获取的是列号
-                    # todo
-                    pass
+            pass
 
     def change_modify_plate(self, row, col, params_dict: dict, **kwargs):
         # 构建 json,
@@ -240,5 +213,3 @@ class Layout:
 
         # 将处理后的值赋回去
         self.modify_plate.loc[row, col] = jb.json_bean()
-
-
