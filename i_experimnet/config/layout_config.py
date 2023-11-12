@@ -21,6 +21,8 @@ class Layout_config:
     # 手工置顶
     params_position = "position"
     params_value = "value"
+    params_curve = "curve"
+    params_sample = "sample"
 
     # 位置字典
     position_start_alpha = "position_start_alpha"
