@@ -42,8 +42,11 @@ class Layout:
         self._col = None
         self._row = None
         self.parameter = None
+        # 启动函数
+        self.layout()
 
     def layout(self):
+        self.layout_init()
         self.help_layout()
 
     def layout_init(self):
@@ -120,6 +123,9 @@ class Layout:
 
             if _input.upper() == "Q":
                 return
+            # 转成大写
+            _input = _input.upper()
+            print(_input)
             # 根据键入的内容分成不同的等式列表
             area_equation_list = _input.split(";")
             # 遍历等式进行分拣
@@ -163,11 +169,11 @@ class Layout:
             position_start, position_end = area.split("-")
             print(position_start)
             # 获取字母部分
-            position_start_alpha = re.findall(self._config.re_alpha, position_start.lower())[0]
+            position_start_alpha = re.findall(self._config.re_alpha, position_start.upper())[0]
             # 获取数字部分
             position_start_digit = re.findall(self._config.re_digit, position_start)[0]
             # 获取字母部分
-            position_end_alpha = re.findall(self._config.re_alpha, position_end.lower())[0]
+            position_end_alpha = re.findall(self._config.re_alpha, position_end.upper())[0]
             # 获取数字部分
             position_end_digit = re.findall(self._config.re_digit, position_end)[0]
             return {
@@ -178,9 +184,9 @@ class Layout:
             }
         else:
             # 获取字母部分
-            position_alpha = re.findall(self._config.re_alpha, area.lower())[0]
+            position_alpha = re.findall(self._config.re_alpha, area.upper())[0]
             # 获取数字部分
-            position_digit = re.findall(self._config.re_digit, area.lower())[0]
+            position_digit = re.findall(self._config.re_digit, area.upper())[0]
             return {
                 self._config.position_alpha: position_alpha,
                 self._config.position_digit: int(position_digit)
@@ -271,7 +277,7 @@ class Layout:
             # 赋值
             self.current_plate.loc[
                 area_dict[self._config.position_start_alpha],
-                area_dict[self._config.position_start_digit:self._config.position_end_digit]] = area_value
+                area_dict[self._config.position_start_digit]:area_dict[self._config.position_end_digit]] = area_value
             # 构造参数字典的参数字典
             kw = {
                 self._config.params_position: self.param_position,

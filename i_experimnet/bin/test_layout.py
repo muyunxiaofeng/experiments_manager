@@ -26,11 +26,15 @@ class TestLayout(TestCase):
     def test_layout_init(self):
         self.layout = Layout()
 
-        self.layout.area_split("aaaa1-abbbb5")
-        area_equation = "(fg/mL)"
-        print(re.findall("\((.*/.*)\)", area_equation))
+        #
+        # self.layout.area_split("aaaa1-abbbb5")
+        # area_equation = "(fg/mL)"
+        # print(re.findall("\((.*/.*)\)", area_equation))
 
         # self.layout.layout_init()
-        # pprint(self.layout.template_plate)
-        # pprint(self.layout.current_plate)
+        pprint(self.layout.template_plate)
+        pprint(self.layout.current_plate)
+        pprint(self.layout.modify_plate)
         # pprint(self.layout.template_plate.to_dict())
+
+

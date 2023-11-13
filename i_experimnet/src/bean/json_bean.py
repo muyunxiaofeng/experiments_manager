@@ -16,6 +16,7 @@ frozensword	用户名（指登录电脑的那个用户名）
 37	当前秒钟
 """
 
+import json
 
 class Json_Bean:
     def __init__(self, _json=None):

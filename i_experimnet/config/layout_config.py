@@ -32,8 +32,8 @@ class Layout_config:
     position_alpha = "position_alpha"
     position_digit = "position_digit"
     # 获取位置的字母部分
-    re_alpha = "([a-z]*)\d*"
-    re_digit = "[a-z]*(\d*)"
+    re_alpha = "([A-Z]*)\d*"
+    re_digit = "[A-Z]*(\d*)"
     # 布板模板
     asc_96 = 96
     asc_96_row = 8
