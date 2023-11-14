@@ -34,15 +34,5 @@ class Layout_config:
     # 获取位置的字母部分
     re_alpha = "([A-Z]*)\d*"
     re_digit = "[A-Z]*(\d*)"
-    # 布板模板
-    asc_96 = 96
-    asc_96_row = 8
-    asc_96_col = 12
-    des_96 = "96T"
-    des_96_row = 12
-    des_96_col = 8
-    asc_12 = 12
-    asc_12_row = 4
-    asc_12_col = 3
-    # 默认行
-    default_row = 8
+    # 全选
+    all = "ALL"

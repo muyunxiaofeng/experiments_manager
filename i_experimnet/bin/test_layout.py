@@ -32,8 +32,8 @@ class TestLayout(TestCase):
         # print(re.findall("\((.*/.*)\)", area_equation))
 
         # self.layout.layout_init()
-        pprint(self.layout.template_plate)
-        pprint(self.layout.current_plate)
+        pprint(self.layout.position_plate)
+        pprint(self.layout.values_plate)
         pprint(self.layout.modify_plate)
         # pprint(self.layout.template_plate.to_dict())
 

@@ -992,3 +992,274 @@ print(df)
 df.iloc[0:2, df.columns['A':'B']] = 0
 ```
 这样，所有在指定行和列范围内的数据都将被设置为0。
+
+## 2023.11.14
+
+### 在Python的pandas库中，你可以很容易地将DataFrame转化为列表。这可以通过使用`.values.tolist()`方法实现。下面是一个例子：
+
+
+```python
+import pandas as pd
+
+# 创建一个DataFrame
+df = pd.DataFrame({
+   'A': [1, 2, 3],
+   'B': [4, 5, 6],
+   'C': [7, 8, 9]
+})
+
+# 将DataFrame转化为列表
+df_list = df.values.tolist()
+
+print(df_list)
+```
+运行以上代码，会输出以下结果：
+
+
+```python
+[    [1, 4, 7],
+    [2, 5, 8],
+    [3, 6, 9]
+]
+```
+### 这就是将DataFrame的每一行转化为一个列表的方法。如果你想将整个DataFrame转化为一个单一的列表，可以按列进行操作，如下所示：
+
+
+```python
+flat_list = df.values.flatten().tolist()
+print(flat_list)
+```
+这将输出：
+
+
+```python
+[1, 4, 7, 2, 5, 8, 3, 6, 9]
+```
+
+## 思路更新-2023.11.14：
+
+从每次单独的设置一个plate进行跨分  方便拓展
+
+```py
+            return
+
+    def area_split(self, area):
+        if "-" in area:
+            position_start, position_end = area.split("-")
+            print(position_start)
+            # 获取字母部分
+            position_start_alpha = re.findall(self._config.re_alpha, position_start.upper())[0].strip()
+            # 获取数字部分
+            position_start_digit = re.findall(self._config.re_digit, position_start)[0].strip()
+            # 获取字母部分
+            position_end_alpha = re.findall(self._config.re_alpha, position_end.upper())[0].strip()
+            # 获取数字部分
+            position_end_digit = re.findall(self._config.re_digit, position_end)[0].strip()
+            return {
+                self._config.position_start_alpha: position_start_alpha,
+                self._config.position_start_digit: int(position_start_digit),
+                self._config.position_end_alpha: position_end_alpha,
+                self._config.position_end_digit: int(position_end_digit)
+            }
+        else:
+            # 获取字母部分
+            position_alpha = re.findall(self._config.re_alpha, area.upper())[0].strip()
+            # 获取数字部分
+            position_digit = re.findall(self._config.re_digit, area.upper())[0].strip()
+            return {
+                self._config.position_alpha: position_alpha,
+                self._config.position_digit: int(position_digit)
+            }
+
+    def set_value_position(self, sub_area, area_value):
+        """
+        多个范围对应一个值
+        :param sub_area:
+        :param area_value:
+        :return:
+        """
+        self.modify_plate = self.values_plate.copy()
+        # 分割区域
+        area_dict = self.area_split(sub_area)
+        if len(area_dict) == 2:
+            # 单点赋值
+            # 呈现结果赋值
+            self.values_plate.loc[
+                area_dict[self._config.position_alpha], area_dict[self._config.position_digit]] = area_value
+            # 获取位置信息
+            # todo 将参数字典抽出来放在 config 中
+            coordinates = self.position_plate.loc[
+                area_dict[self._config.position_alpha], area_dict[self._config.position_digit]]
+            params_dict = {
+                self._config.params_position: coordinates,
+                self._config.params_value: area_value
+            }
+            self.change_modify_plate(row=area_dict[self._config.position_alpha],
+                                     col=area_dict[self._config.position_digit],
+                                     params_dict=params_dict)
+        else:
+
+            # 先要判定大小
+            if self._config.position_start_digit > self._config.position_end_digit:
+                # 如果是反的 则调换位置
+                self._config.position_start_digit, self._config.position_end_digit = \
+                    self._config.position_end_digit, self._config.position_start_digit
+
+            # 赋值
+            self.values_plate.loc[
+            area_dict[self._config.position_start_alpha],
+            area_dict[self._config.position_start_digit]:area_dict[self._config.position_end_digit]] = area_value
+            # 构造参数字典的参数字典
+            kw = {
+                self._config.params_position: self.param_position,
+                self._config.params_value: self.param_value
+            }
+            self.batch_change_modify_plate(
+                row_start=area_dict[self._config.position_start_alpha],
+                row_end=area_dict[self._config.position_end_alpha],
+                col_start=area_dict[self._config.position_start_digit],
+                col_end=area_dict[self._config.position_end_digit],
+                para=area_value,
+                **kw
+            )
+
+    def set_area_to_many_values(self, sub_area, area_values, parameter):
+        """
+        根据输入的参数输入参数可以将参数修改
+        :param sub_area:
+        :param area_values:
+        :param parameter:
+        :return:
+        """
+        self.modify_plate = self.values_plate.copy()
+        # 分割区域
+        area_dict = self.area_split(sub_area)
+        value_dict = self.area_split(area_values)
+
+        # 先要判定大小
+        if self._config.position_start_digit > self._config.position_end_digit:
+            # 如果是反的 则调换位置
+            self._config.position_start_digit, self._config.position_end_digit = \
+                self._config.position_end_digit, self._config.position_start_digit
+        # 让前缀相等
+        if value_dict[self._config.position_start_alpha] != value_dict[self._config.position_end_alpha]:
+            value_dict[self._config.position_end_alpha] = value_dict[self._config.position_start_alpha]
+        # 生成名称列表
+        if value_dict[self._config.position_start_digit] < value_dict[self._config.position_end_digit]:
+            param_values_list = [f"{value_dict[self._config.position_start_alpha]} - {num}" for num in
+                                 range(self._config.position_start_digit, self._config.position_end_digit + 1)]
+        else:
+            param_values_list = [f"{value_dict[self._config.position_start_alpha]} - {num}" for num in
+                                 range(self._config.position_start_digit, self._config.position_end_digit + 1, -1)]
+        # 将字母转化为数字
+        row_start = alpha_calculator.alpha_calculator(area_dict[self._config.position_start_alpha])
+        row_end = alpha_calculator.alpha_calculator(area_dict[self._config.position_end_alpha])
+        col_start = area_dict[self._config.position_start_digit]
+        col_end = area_dict[self._config.position_end_digit]
+        # 比较大小反向则倒置
+        if row_start > row_end:
+            row_start, row_end = row_end, row_start
+        if col_start > col_end:
+            col_start, col_end = col_end, col_start
+        index = 0
+        for _col in range(col_start, col_end + 1):
+            for _row in range(row_start, row_end + 1):
+                self._row = _row
+                self._col = _col
+                # 构造参数字典的参数字典
+                para_dict = {
+                    parameter: self.param_value
+                }
+                self.batch_change_modify_plate(
+                    row_start=_row,
+                    row_end=_row,
+                    col_start=_col,
+                    col_end=_col,
+                    para=param_values_list[index],
+                    parameter=self.param_value
+                    # **para_dict
+                )
+
+    def change_modify_plate(self, row, col, params_dict: dict, **kwargs):
+        # 构建 json,
+        # 获取 modify 的值
+        mj = self.modify_plate.loc[row, col]
+        # 无论是不是空值都扔进去
+        jb = Json_Bean(mj)
+        # 赋值位置信息和值
+        for param in params_dict:
+            jb.input_para(var_name=param, var_value=params_dict[param])
+
+        # 将处理后的值赋回去
+        self.modify_plate.loc[row, col] = jb.json_bean()
+
+    def batch_change_modify_plate(self, row_start, row_end, col_start, col_end, para, **kwargs):
+        # 将字母转化为数字
+        row_start = alpha_calculator.alpha_calculator(row_start)
+        row_end = alpha_calculator.alpha_calculator(row_end)
+        # 比较大小反向则倒置
+        if row_start > row_end:
+            row_start, row_end = row_end, row_start
+        if col_start > col_end:
+            col_start, col_end = col_end, col_start
+        # 根据模板获取要分析的区域
+        to_handle_area = self.position_plate.iloc[row_start - 1:row_end, col_start - 1:col_end]
+        # 将分析的区域并扁平化转化为列表
+        to_handle_area_list = to_handle_area.values.flatten().tolist()
+        exit()
+
+        for _col in range(col_start, col_end + 1):
+            for _row in range(row_start, row_end + 1):
+                self._row = plate_number.upper_row(_row)
+                self._col = _col
+                self.parameter = para
+                print(self._row, self._col)
+                params_dict = dict()
+                print(kwargs)
+                for kwarg in kwargs:
+                    # {kwarg => self._config.params_position
+                    # kwargs[kwarg] => self.param_position >>>()
+                    params_dict[kwarg] = kwargs[kwarg]()
+
+                # 逐个修改参数
+                self.change_modify_plate(
+                    row=self._row, col=self._col,
+                    params_dict=params_dict
+                )
+
+    """
+    参数方法的分界线
+    
+    """
+
+    def param_position(self):
+        """
+        返回这个点的坐标值
+        :return:
+        """
+        return self.position_plate.loc[self._row, self._col]
+
+    def param_value(self):
+        """
+        返回这个点的值
+        :return:
+        """
+        return self.parameter
+
+```
+
+在Python中，有一些特殊的魔法函数可以用来打印类和对象的信息。这些函数通常以`__`（双下划线）开头和结尾，这种命名方式是为了防止与实例方法或变量名冲突。
+
+以下是一些常用的魔法函数：
+
+1. `__str__(self)`：这个函数返回一个对象的字符串表示形式，当使用`print()`函数打印对象时，会调用这个函数。
+2. `__repr__(self)`：这个函数返回一个对象的官方字符串表示形式，通常比`__str__(self)`更详细。在Python解释器中直接输入对象名称时，会调用这个函数。
+3. `__len__(self)`：这个函数返回对象的长度（例如，对于列表或字符串），当使用`len()`函数时，会调用这个函数。
+4. `__eq__(self, other)`：这个函数检查两个对象是否相等，当使用`==`操作符时，会调用这个函数。
+5. `__ne__(self, other)`：这个函数检查两个对象是否不相等，当使用`!=`操作符时，会调用这个函数。
+6. `__lt__(self, other)`：这个函数检查一个对象是否小于另一个对象，当使用`<`操作符时，会调用这个函数。
+7. `__le__(self, other)`：这个函数检查一个对象是否小于或等于另一个对象，当使用`<=`操作符时，会调用这个函数。
+8. `__gt__(self, other)`：这个函数检查一个对象是否大于另一个对象，当使用`>`操作符时，会调用这个函数。
+9. `__ge__(self, other)`：这个函数检查一个对象是否大于或等于另一个对象，当使用`>=`操作符时，会调用这个函数。
+
+这些魔法方法可以帮助你更好地控制你的对象的行为，并在必要时提供更多的信息。

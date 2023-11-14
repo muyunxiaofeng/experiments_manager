@@ -18,6 +18,7 @@ frozensword	用户名（指登录电脑的那个用户名）
 
 import json
 
+
 class Json_Bean:
     def __init__(self, _json=None):
         if _json is not None:
@@ -50,4 +51,3 @@ class Json_Bean:
         self.__setattr__(var_name, var_value)
 
         return self.__dict__
-
