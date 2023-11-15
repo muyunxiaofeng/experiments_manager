@@ -17,6 +17,45 @@ merge_plate	文件名
 """
 
 from i_experimnet.src.bean.json_bean import Json_Bean
-class Merge_plates:
-    def __init__(self):
+from i_experimnet.src.plate import Plate
 
+
+class Merge_plates:
+    def __init__(self, merge_list=None):
+        # 初始化
+        self.mp = Plate("finally")
+        # 合并列表
+        self.merge_list = merge_list
+        if merge_list:
+            self.merge_init(merge_list[0])
+            self.merging()
+        print(self.mp)
+
+    def merge_init(self, plate: Plate):
+        # 获取合并板的规格
+        self.mp.plate = plate.plate
+        # 进行初始化
+        self.mp.make_plate()
+        # 赋值
+        self.mp.modify_plate.iloc[:, :] = "{}"
+        print(self.mp)
+
+    def merging(self):
+
+        for _row in range(self.mp.row):
+            for _col in range(self.mp.col):
+                for plate in self.merge_list:
+                    if _col == 0 and _row == 0:
+                        print(plate)
+                    # 获取值
+                    v = plate.modify_plate.iloc[_row, _col]
+                    # 获取引用
+                    k = plate.plate_name
+                    # 获取之前的json
+                    _json = self.mp.modify_plate.iloc[_row, _col]
+                    # 构建json_bean
+                    jb = Json_Bean(_json)
+                    # 插入参数
+                    jb.input_para(var_name=k, var_value=v)
+
+                    self.mp.modify_plate.iloc[_row, _col] = jb.json_bean()

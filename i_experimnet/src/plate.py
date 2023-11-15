@@ -18,6 +18,8 @@ plate	文件名
 import math
 from pprint import pprint
 
+import pandas as pd
+
 from i_experimnet.config import plate_config
 from i_experimnet.utils import plate_number, alpha_calculator
 
@@ -48,6 +50,10 @@ class Plate:
         根据不同版型进行布板的初始化
         :return:
         """
+        # 位置模板
+        self.position_plate = []
+        # 空板
+        self.empty_plate = []
         # 根据不同的版型选择不同的布板位置
         match self.plate:
             case self._config.asc_96:
@@ -83,3 +89,4 @@ class Plate:
         print()
         print("=" * 20, self.plate_name, "=" * 20)
         pprint(self.modify_plate)
+        return "Plate class"
