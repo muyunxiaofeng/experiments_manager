@@ -1263,3 +1263,331 @@ print(flat_list)
 9. `__ge__(self, other)`：这个函数检查一个对象是否大于或等于另一个对象，当使用`>=`操作符时，会调用这个函数。
 
 这些魔法方法可以帮助你更好地控制你的对象的行为，并在必要时提供更多的信息。
+
+## 2023.11.15
+
+### dir（）/vars()
+
+使用`dir()`函数获取的变量可能不完全准确的原因是，`dir()`函数返回的是对象的所有属性，包括它的方法和嵌套的属性。因此，如果你只对类中的实例变量感兴趣，那么需要进一步筛选和处理`dir()`函数返回的结果。
+
+在上面的示例代码中，我们使用`isinstance()`函数和`getattr()`函数来筛选出字符串类型的属性，从而得到类中的实例变量。但是，这并不是一种完全准确的方法，因为有些变量可能是其他类型的对象，只是这些对象的行为类似于字符串。此外，如果类中有同名的方法或嵌套的属性，那么使用`dir()`函数获取的变量可能会包含这些方法或嵌套的属性。
+
+因此，如果你需要获取类中准确的实例变量，可以考虑使用Python内置的`vars()`函数。`vars()`函数返回对象的所有实例变量，不包括它的方法和嵌套的属性。例如：
+
+
+```python
+class MyClass:
+    def __init__(self):
+        self.attribute1 = "Hello"
+        self.attribute2 = 123
+        self.attribute3 = "World"
+    
+    def method1(self):
+        pass
+
+obj = MyClass()
+vars = vars(obj)
+print(vars)  # {'attribute1': 'Hello', 'attribute2': 123, 'attribute3': 'World'}
+```
+在上面的代码中，`vars()`函数返回了对象`obj`的所有实例变量，不包括它的方法。这样可以得到更准确的类中实例变量的列表。
+
+### 在Python的pandas库中，你可以使用`concat()`函数或者`merge()`函数来横向或竖向合并两个DataFrame。
+
+1. 横向合并 (按行): 使用`concat()`函数
+
+
+```python
+import pandas as pd
+
+# 创建两个DataFrame
+df1 = pd.DataFrame({'A': ['A0', 'A1', 'A2'],
+                   'B': ['B0', 'B1', 'B2'],
+                   'C': ['C0', 'C1', 'C2'],
+                   'D': ['D0', 'D1', 'D2']},
+                  index=[0, 1, 2])
+
+df2 = pd.DataFrame({'A': ['A3', 'A4', 'A5'],
+                   'B': ['B3', 'B4', 'B5'],
+                   'C': ['C3', 'C4', 'C5'],
+                   'D': ['D3', 'D4', 'D5']},
+                  index=[3, 4, 5])
+
+# 横向合并
+result = pd.concat([df1, df2])
+```
+2. 竖向合并 (按列): 使用`concat()`函数，设置`axis=1`
+
+
+```python
+import pandas as pd
+
+# 创建两个DataFrame
+df1 = pd.DataFrame({'A': ['A0', 'A1'],
+                   'B': ['B0', 'B1']},
+                  index=[0, 1])
+
+df2 = pd.DataFrame({'C': ['C0', 'C1'],
+                   'D': ['D0', 'D1']},
+                  index=[0, 1])
+
+# 竖向合并
+result = pd.concat([df1, df2], axis=1)
+```
+3. 基于列的合并: 使用`merge()`函数
+
+
+```python
+import pandas as pd
+
+# 创建两个DataFrame
+df1 = pd.DataFrame({'key': ['K0', 'K1'],
+                   'value': ['V0', 'V1']})
+
+df2 = pd.DataFrame({'key': ['K0', 'K1'],
+                   'other_value': ['OV0', 'OV1']})
+
+# 基于列的合并
+result = pd.merge(df1, df2, on='key')
+```
+这些函数默认在合并时不会改变数据的顺序，但你可以使用`sort=True`参数来改变合并后的顺序。同时，请注意，这些操作默认不会改变原始DataFrame，如果你想改变原始DataFrame，你可以设置`inplace=True`。
+
+
+
+### 在Pandas DataFrame中，你可以使用`.loc`或`.iloc`方法来按列取出DataFrame中的一块区域的值。
+
+`.loc`方法是基于列标签的数据选择方法，你可以通过指定列标签来取出指定列的数据。例如，如果你有一个DataFrame，其中包含列"A"、"B"和"C"，你可以使用以下代码按列取出"A"列的数据：
+
+
+```python
+import pandas as pd
+
+# 创建一个示例DataFrame
+data = {'A': [1, 2, 3, 4],
+        'B': [5, 6, 7, 8],
+        'C': [9, 10, 11, 12]}
+df = pd.DataFrame(data)
+
+# 使用.loc方法取出"A"列的数据
+a_column = df.loc[:, 'A']
+print(a_column)
+```
+这将输出以下内容：
+
+
+```python
+0    1
+1    2
+2    3
+3    4
+Name: A, dtype: int64
+```
+如果你想要按行索引取出指定行的数据，可以使用`.iloc`方法。例如，如果你想要取出第1行和第3行的数据，可以像下面这样使用`.iloc`方法：
+
+
+```python
+import pandas as pd
+
+# 创建一个示例DataFrame
+data = {'A': [1, 2, 3, 4],
+        'B': [5, 6, 7, 8],
+        'C': [9, 10, 11, 12]}
+df = pd.DataFrame(data)
+
+# 使用.iloc方法取出第1行和第3行的数据
+selected_rows = df.iloc[[0, 2]]
+print(selected_rows)
+```
+这将输出以下内容：
+
+
+```python
+   A  B  C
+0  1  5  9
+2  3  7  11
+```
+
+### 要将Pandas DataFrame存储到MySQL数据库中，你可以使用Python的mysql-connector库。下面是一个基本的步骤：
+
+1. 首先，确保你已经安装了mysql-connector。如果没有，可以通过pip进行安装：
+
+
+```
+pip install mysql-connector-python
+```
+2. 导入必要的库：
+
+
+```python
+import pandas as pd
+import mysql.connector
+from sqlalchemy import create_engine
+```
+3. 创建一个MySQL连接：
+
+
+```python
+# 填写你的数据库信息
+mydb = mysql.connector.connect(
+  host="localhost", # your host, usually localhost
+  user="yourusername", # your username
+  password="yourpassword", # your password
+  database="mydatabase" # name of the data base
+)
+```
+4. 创建一个SQL引擎，这个引擎将用于执行所有的SQL查询：
+
+
+```python
+engine = create_engine('mysql+mysqlconnector://{user}:{pw}@localhost/{db}'.format(user=mydb.user, pw=mydb.password, db=mydb.database))
+```
+5. 使用Pandas的to_sql方法将DataFrame存储到MySQL：
+
+
+```python
+# 假设你的DataFrame名为df
+df.to_sql('my_table', con = engine, if_exists = 'replace', index=False)
+```
+在这个例子中，'my_table'是你要存储的表的名称。'if_exists'参数决定当表已经存在时如何处理。'replace'意味着如果表已经存在，那么将其替换。你也可以选择'append'（将新数据添加到现有表中）或'fail'（如果表存在，则不进行任何操作）。最后，`index=False`表示我们不想将DataFrame的索引存储为数据库中的列。
+
+### 要将Pandas DataFrame存储到Excel文件中，你可以使用Pandas库的`to_excel`方法。下面是一个基本的步骤：
+
+首先，确保你已经安装了openpyxl库，这是一个用于读写Excel文件的库。如果没有安装，可以通过pip进行安装：
+
+
+```
+pip install openpyxl
+```
+然后，你可以使用以下代码将DataFrame存储到Excel文件中：
+
+
+```python
+import pandas as pd
+
+# 创建一个示例DataFrame
+data = {'Name': ['John', 'Emma', 'Tom'], 'Age': [25, 30, 35], 'City': ['New York', 'Paris', 'London']}
+df = pd.DataFrame(data)
+
+# 将DataFrame存储到Excel文件中
+df.to_excel('output.xlsx', index=False)
+```
+在这个例子中，`output.xlsx`是你想要创建的Excel文件的名称。`index=False`表示我们不想将DataFrame的索引存储到Excel文件中。如果你想要将索引存储到Excel文件中，可以省略这个参数或将其设置为`True`。
+
+### 导出项目的依赖包有多种方式，具体方式如下：
+
+1. 你可以通过pip list命令导出项目所需的所有依赖包。首先，在Anaconda PowerShell Prompt中执行“pip list --format=freeze”命令，然后将输出的依赖包信息重定向到一个文本文件中。
+2. 如果只需要导出当前项目所需的依赖包，可以进入项目目录，然后执行“pip freeze > requirements.txt”命令。这将导出当前环境中的所有包及其路径，并将其保存到requirements.txt文件中。
+3. 如果你使用的是pipreqs插件，可以按照以下步骤导出项目的依赖包：首先，安装pipreqs插件；然后，切换到项目的根目录；最后，执行“pipreqs ./”命令即可导出项目所调用的包。
+
+需要注意的是，如果你使用的是多虚拟环境，需要进入到指定的虚拟环境中执行安装和导出命令。另外，不同的操作系统和终端环境可能存在差异，具体操作可能会有所不同。
+
+### 在PyCharm中导出虚拟环境中的依赖包，可以按照以下步骤进行操作：
+
+1. 打开PyCharm，并打开你的项目。
+2. 确保你已经在PyCharm中配置了正确的虚拟环境。你可以通过选择"File"（文件）菜单中的"Settings"（设置）选项，然后选择"Project: [your_project_name]"（项目：[你的项目名称]）下的"Project Interpreter"（项目解释器）来配置虚拟环境。
+3. 在PyCharm的底部状态栏中，找到并点击"Terminal"（终端）按钮。这将打开一个终端窗口，你可以在其中执行命令。
+4. 在终端窗口中，使用以下命令导出虚拟环境中的依赖包：
+
+
+```
+pip freeze > requirements.txt
+```
+这个命令会将当前虚拟环境中的所有包及其版本信息导出到名为"requirements.txt"的文件中。
+5. 等待命令执行完成，然后就会在当前目录下生成一个名为"requirements.txt"的文件，其中包含了虚拟环境中的所有依赖包信息。
+
+现在你可以使用这个"requirements.txt"文件来重新创建相同的虚拟环境，或者将其提供给其他人使用。
+
+
+
+### 你遇到的问题是尝试更改 PowerShell 的执行策略时被拒绝，这通常是由于权限问题导致的。在尝试执行 `Set-ExecutionPolicy` 命令时，你可能没有足够的权限来更改执行策略。
+
+无法加载文件 C:\Users\41379\experiments_manager\Scripts\activate.ps1。未对文件 C:\Users\41379\experiments_manager\Scripts\activate.ps1 进行数字签名。无法在当前系统上运行该脚本。有关运行脚本和设置执行策略的详细信息，请参阅 https:/go .microsoft.com/fwlink/?LinkID=135170 中的 about_Execution_Policies。    + CategoryInfo          : SecurityError: (:) []，ParentContainsErrorRecordException    + FullyQualifiedErrorId : UnauthorizedAccess
+
+
+要解决这个问题，你有几个选项：
+
+1. **以管理员身份运行 PowerShell**：你可以尝试以管理员身份运行 PowerShell，这可以通过在 PowerShell 的快捷方式上右键点击并选择“以管理员身份运行”来实现。
+2. **使用管理员权限运行 PowerShell 命令**：如果你已经在 PowerShell 中，你可以尝试使用 `runas` 命令来以管理员权限运行 PowerShell。在命令提示符中输入 `runas /user:Administrator "powershell.exe"`，然后按 Enter。这会尝试以管理员权限运行 PowerShell。如果系统要求你输入管理员密码，请输入密码并按 Enter。
+3. **更改执行策略的当前用户的权限**：你可以运行以下命令来更改当前用户的执行策略：
+
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Unrestricted -Force
+```
+这会更改当前用户的执行策略，而不需要管理员权限。请注意，这将仅对当前用户有效，而不会影响其他用户。
+
+如果你已经以管理员身份运行 PowerShell，但仍然遇到这个问题，那可能是因为你的账户没有足够的权限来更改执行策略。在这种情况下，你可能需要联系你的系统管理员以获取必要的权限。
+
+
+
+
+
+### 导出python当前项目依赖清单requirements.txt
+
+[![二愣子](assets/v2-daf47703e5469fd7acbce2084828efe7_l.jpg)](https://www.zhihu.com/people/mambazyd-5)
+
+[二愣子](https://www.zhihu.com/people/mambazyd-5)
+
+[](https://www.zhihu.com/question/48510028)
+
+高等教育行业 教师
+
+关注他
+
+**平时我们在编写或者使用别人的Python项目时，往往会看到一个文档requirements.txt，该文档是描述一个Python项目中依赖的第三方库的名称以及版本。本文介绍只导出python当前项目依赖包操作步骤。**
+
+#### 方法一：
+
+如果每个项目有对应的虚拟虚拟环境，那么使用pycharm的终端里，在当前项目下，直接实现使用命令：pip freeze > requirements.txt #pip命令生成依赖性清单
+
+#### 方法二：
+
+注意：如果在python项目全局环境里直接使用 pip freeze > requirements.txt 会导出大量与该项目无关的依赖，包括很多个包信息，其实这里是把你当前 python 环境的所有包的相关信息导出来了。如果我们只需导出当前项目所需的依赖包，还可以采用另外一种方式，使用工具：pipreqs
+
+##### 步骤一、安装pipreqs：
+
+```text
+pip install pipreqs
+```
+
+![img](assets/v2-3bf3567cd63f0485a87bc33c2133cea0_720w.png)
+
+##### 步骤二：进入当前项目目录下，导出依赖清单
+
+```text
+pipreqs ./
+```
+
+![img](assets/v2-4aad15e939809919a5d2ce263e282f86_720w.png)
+
+如果遇到编码错误UnicodeDecodeError，则将指定编码为utf8：
+
+```text
+pipreqs ./ --encoding=utf8
+pipreqs ./ --encoding='iso-8859-1' 
+```
+
+(导包完成会在项目路径下生成一个requirements.txt文件)
+
+![img](assets/v2-d6bd9c99a6ca5bcbf9f740e1975d0fdc_720w.png)
+
+![img](assets/v2-6e33a40d811aab093e1cbd038ac72855_720w.png)
+
+#### 方法三：使用pycharm 的工具导出requirements.txt
+
+在pycharm上，找到Tool工具，选择Sync Python Requirements，如下：
+
+![img](assets/v2-29c32f723d194f295e139be1722db1f4_720w.png)
+
+![img](assets/v2-8f6a5e558107f3b43930fd6474e5c537_720w.png)
+
+在项目根目录下就会生成requirements.txt文档
+
+![img](assets/v2-bb40e70bb7d4e926ea3f84a1db2286c5_720w.png)
+
+
+
+后续安装该项目的依赖时，即可直接使用：
+
+pip install -r requirements.txt
+
+养成良好的编程习惯。

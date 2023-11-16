@@ -20,6 +20,7 @@ layout_init 初始化布板方法
 
 import re
 
+from i_experimnet.bin.merge_plate import Merge_plates
 from i_experimnet.utils import alpha_calculator
 from i_experimnet.config.layout_config import Layout_config
 from i_experimnet.src.plate import Plate
@@ -28,16 +29,14 @@ from i_experimnet.src.plate import Plate
 class Layout:
     def __init__(self, plate=96):
         # result
-        self.result = Merge_plate()
+
+        self.result = Merge_plates()
 
         # 参数
+        self.sample_plate = None
         self.unit_plate = None
         self.values_plate = None
-        self.plate_list = [
-            self.unit_plate,
-            self.values_plate,
-            self.modify_plate,
-        ]
+
         # 版型
         self.plate = plate
 
@@ -48,13 +47,22 @@ class Layout:
         self._col = None
         self._row = None
         self.parameter = None
-
+        # 样本储存列表
+        self.sample_list = list()
+        # 样本布板方向
+        self.sample_direction = None
         # 启动函数
         self.layout()
 
     def layout(self):
         self.layout_init()
         self.help_layout()
+        for plate in self.list_plate():
+            print(plate)
+
+    def list_plate(self):
+        # return [attrs for attr in dir(self) if isinstance(getattr(self, attr), Plate)]
+        return [getattr(self, attr) for attr in dir(self) if isinstance(getattr(self, attr), Plate)]
 
     def layout_init(self):
         """
@@ -66,6 +74,8 @@ class Layout:
         self.values_plate = Plate("value", self.plate)
         # 单位的模板
         self.unit_plate = Plate("unit", self.plate)
+        # 样本布板
+        self.sample_plate = Plate("samples", self.plate)
 
     def help_layout(self):
         """
@@ -74,8 +84,8 @@ class Layout:
         """
         while 1:
             print("例：", "a1-a3,a4,a5=0;b12=1000;(fg/mL);",
-                  "^curve=a1-h6;^sample=a7-h7,a7-h12;{1}=a1-h2;",
-                  "[sample_name<sample_number~6>sample_type%sample_from:h1-h7]")
+                  "^curve:a1-h6;^sample:a7-h7,a7-h12;{进入分散样本命名方法};",
+                  "[sample_name<sample_number~6>sample_type%sample_from]sample_direction:h1-h7;")
             _input = input("请输入位置信息，用区域间用分号隔开，只输入Q退出：").strip()
             if not _input:
                 print("不能输入空值~")
@@ -106,18 +116,47 @@ class Layout:
                 elif "^" in area_equation:
                     if "curve" in area_equation.lower():
                         # 将赋值部分进行处理
-                        area, area_value = area_equation.split("=")
+                        area, area_value = area_equation.split(":")
                         # [] 列表化
                         sub_area_list = area.split(",")
                         # 遍历列表进行处理
                         for sub_area in sub_area_list:
-                            self.set_area_to_many_values(sub_area, area_value, parameter=self._config.params_curve)
+                            pass
                         # todo curve
                     elif "sample" in area_equation.lower():
                         # todo sample
                         pass
                 elif "{" in area_equation:
+                    # todo 暂存样本列表
+                    while 1:
+
+                        # 提示用户输入
+                        sample_input = input("请输入样本序号，只输入Q退出：").strip()
+                        if not sample_input:
+                            print("不能输入空值~")
+                            continue
+                        if sample_input.upper() == "Q":
+                            print(self.sample_list)
+                            break
+                        elif sample_input.isdecimal():
+                            self.sample_list.append(sample_input)
+
+                elif "*" in area_equation:
                     # todo 这里是要调取布板信息的
+                    pass
+                elif "[" in area_equation:
+                    # 将赋值部分进行处理
+                    samples, area = area_equation.split(":")
+                    # [] 列表化
+                    sub_area_list = area.split(",")
+                    # 样本处理
+                    self.sample_split(samples)
+                    # 遍历列表进行处理
+                    for sub_area in sub_area_list:
+                        # sample_area_list
+                        pass
+
+                    # todo 这里是调取样本布板信息
                     pass
 
     def set_values(self, sub_area, area_value, data_frame: Plate):
@@ -136,6 +175,7 @@ class Layout:
             col_end = area_dict[self._config.position_end_digit]
         # 修改
         data_frame.iloc[row_start - 1:row_end, col_start - 1:col_end] = area_value
+        print(data_frame)
 
     def area_split(self, area):
         if "-" in area:
@@ -175,7 +215,7 @@ class Layout:
             }
 
     def sample_split(self, samples):
-        # sample_name<sample_number~6>sample_type%sample_from
+        # [sample_name<sample_number~6>sample_type%sample_from:sample_direction=h1-h7]
         # 样本分拆 样本名 “<”
         sample_name_prefix, samples = samples.split("<")
         # 样本编号 ~
@@ -185,5 +225,24 @@ class Layout:
         # 数字化
         samples_start = int(samples_start)
         samples_end = int(samples_end)
+        if not self.sample_list:
+            self.sample_list = [sample_i for sample_i in range(samples_start, samples_end + 1)]
+        new_list = list()
+        for sample_name in self.sample_list:
+            new_list.append(f"{sample_name_prefix}-{sample_name}")
         # 样本来源 %
-        sample_type, sample_from = samples.split("%")
+        sample_type, samples = samples.split("%")
+        # 样本命名方向 ：
+        sample_from, sample_direction = samples.split("]")
+        # 将sample_direction 赋值给self中的值
+        if sample_direction:
+            self.sample_direction = sample_direction
+        print(sample_direction)
+
+    def sample_area_list(self, area):
+        area_dict = self.area_split(area)
+        # 修改值
+        row_start = area_dict[self._config.position_start_alpha]
+        row_end = area_dict[self._config.position_end_alpha]
+        col_start = area_dict[self._config.position_start_digit]
+        col_end = area_dict[self._config.position_end_digit]

@@ -51,3 +51,5 @@ class Json_Bean:
         self.__setattr__(var_name, var_value)
 
         return self.__dict__
+
+

@@ -36,12 +36,15 @@ def col(num, outline=""):
     return outline[::-1]
 
 
-col(0)
-col(3)
-col(26)
-col(28)
-col(26 * 2)
-col(26 * 2 + 2)
-col_num = [col(index) for index in range(1, 13)]
-print(col_num)
-print("jhgjhg".split(","))
+
+import pandas as pd
+
+# 创建一个示例DataFrame
+data = {'A': [1, 2, 3, 4],
+        'B': [5, 6, 7, 8],
+        'C': [9, 10, 11, 12]}
+df = pd.DataFrame(data)
+
+# 使用.iloc方法取出第1行和第3行的数据
+selected_rows = df.iloc[[0, 2]]
+print(selected_rows)
