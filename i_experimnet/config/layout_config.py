@@ -36,3 +36,30 @@ class Layout_config:
     re_digit = "[A-Z]*(\d*)"
     # 全选
     all = "ALL"
+    # direction
+    sample_direction_dic = {
+        "竖向点样，横向延伸，A1-H1，A2-H2": self._config.down_right,
+        "横向点样，竖向延伸，A1-A12，B1-B12": self._config.right_down,
+        "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": self._config.up_left,
+        "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": self._config.left_up,
+        "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": self._config.up_right,
+        "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": self._config.right_up,
+        "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": self._config.down_left,
+        "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": self._config.left_down,
+    }
+    # "竖向点样，横向延伸，A1-H1，A2-H2": "down_right",
+    down_right = "down_right"
+    # "横向点样，竖向延伸，A1-A12，B1-B12": "right_down",
+    right_down = "right_down"
+    # "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": "up_left",
+    up_left = "up_left"
+    # "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": "left_up",
+    left_up = "left_up"
+    # "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": "up_right",
+    up_right = "up_right"
+    # "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": "right_up",
+    right_up = "right_up"
+    # "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": "down_left",
+    down_left = "down_left"
+    # "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": "left_down",
+    left_down = "left_down"

@@ -30,3 +30,5 @@ class Plate_config:
     asc_12_col = 3
     # 默认行
     default_row = 8
+
+

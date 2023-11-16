@@ -25,6 +25,13 @@ class TestLayout(TestCase):
 
     def test_layout_init(self):
         self.layout = Layout()
+        # print(self.layout.down_right(1, 3, 1, 3))
+        # print(self.layout.left_up(1, 3, 1, 3))
+        # print(self.layout.right_down(1, 3, 1, 3))
+        # print(self.layout.up_right(1, 3, 1, 3))
+        # print(self.layout.right_up(1, 3, 1, 3))
+        # print(self.layout.down_left(1, 3, 1, 3))
+        # print(self.layout.left_down(1, 3, 1, 3))
 
         #
         # self.layout.area_split("aaaa1-abbbb5")
@@ -36,4 +43,3 @@ class TestLayout(TestCase):
         # pprint(self.layout.values_plate)
         # pprint(self.layout.modify_plate)
         # pprint(self.layout.template_plate.to_dict())
-

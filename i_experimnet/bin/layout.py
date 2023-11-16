@@ -28,14 +28,24 @@ from i_experimnet.src.plate import Plate
 
 class Layout:
     def __init__(self, plate=96):
-        # result
+        # 中间储存的一些信息
+        self.sample_from = None
+        self.sample_type = None
 
+        # result
         self.result = Merge_plates()
 
         # 参数
-        self.sample_plate = None
-        self.unit_plate = None
-        self.values_plate = None
+        # 数值的模板
+        self.values_plate = Plate("value", self.plate)
+        # 布板类型的模板
+        self.type_plate = Plate("type", self.plate)
+        # 单位的模板
+        self.unit_plate = Plate("unit", self.plate)
+        # 样本布板
+        self.sample_plate = Plate("samples", self.plate)
+        self.sample_from_plate = Plate("sample_from", self.plate)
+        self.sample_type_plate = Plate("sample_type", self.plate)
 
         # 版型
         self.plate = plate
@@ -51,6 +61,8 @@ class Layout:
         self.sample_list = list()
         # 样本布板方向
         self.sample_direction = None
+        # 样本位置的储存列表
+        self.sample_position_list = list()
         # 启动函数
         self.layout()
 
@@ -70,12 +82,7 @@ class Layout:
         :return:
         """
 
-        # 数值的模板
-        self.values_plate = Plate("value", self.plate)
-        # 单位的模板
-        self.unit_plate = Plate("unit", self.plate)
-        # 样本布板
-        self.sample_plate = Plate("samples", self.plate)
+        pass
 
     def help_layout(self):
         """
@@ -113,19 +120,11 @@ class Layout:
                     # 遍历列表进行处理
                     for sub_area in sub_area_list:
                         self.set_values(sub_area, area_value, self.values_plate.modify_plate)
+                        self.set_values(sub_area, self._config.params_curve, self.type_plate.modify_plate)
+
                 elif "^" in area_equation:
-                    if "curve" in area_equation.lower():
-                        # 将赋值部分进行处理
-                        area, area_value = area_equation.split(":")
-                        # [] 列表化
-                        sub_area_list = area.split(",")
-                        # 遍历列表进行处理
-                        for sub_area in sub_area_list:
-                            pass
-                        # todo curve
-                    elif "sample" in area_equation.lower():
-                        # todo sample
-                        pass
+
+                    pass
                 elif "{" in area_equation:
                     # todo 暂存样本列表
                     while 1:
@@ -153,11 +152,11 @@ class Layout:
                     self.sample_split(samples)
                     # 遍历列表进行处理
                     for sub_area in sub_area_list:
-                        # sample_area_list
-                        pass
+                        self.sample_area_list(sub_area)
+                        self.set_values(sub_area=sub_area, area_value=self._config.params_sample,
+                                        data_frame=self.type_plate.modify_plate)
 
-                    # todo 这里是调取样本布板信息
-                    pass
+                    self.set_sample()
 
     def set_values(self, sub_area, area_value, data_frame: Plate):
         if sub_area == self._config.all:
@@ -223,19 +222,38 @@ class Layout:
         # 样本类型 >
         samples_end, samples = samples.split(">")
         # 数字化
-        samples_start = int(samples_start)
-        samples_end = int(samples_end)
-        if not self.sample_list:
-            self.sample_list = [sample_i for sample_i in range(samples_start, samples_end + 1)]
+        if samples_start and samples_end:
+            samples_start = int(samples_start)
+            samples_end = int(samples_end)
+            self.sample_list += [sample_i for sample_i in range(samples_start, samples_end + 1)]
         new_list = list()
         for sample_name in self.sample_list:
             new_list.append(f"{sample_name_prefix}-{sample_name}")
         # 样本来源 %
         sample_type, samples = samples.split("%")
+        self.sample_type = sample_type
         # 样本命名方向 ：
         sample_from, sample_direction = samples.split("]")
+        self.sample_from = sample_from
+        # 为了保证选择正确  需要提示下输入方向
+        sample_direction_dic = self._config.sample_direction_dic
+        while 1:
+            # 展示方法并调用
+            for i, method in enumerate(sample_direction_dic):
+                print(i, " ", method)
+            # 提示用户输入
+            _input = input("请输入要选择的序号，只输入Q退出：").strip()
+            if not _input:
+                print("不能输入空值~")
+                continue
+            if _input.upper() == "Q":
+                return
+            if _input.isdecimal() and int(_input) < len(sample_direction_dic):
+                self.sample_direction = list(sample_direction_dic.values())[int(_input)]
+                break
+
         # 将sample_direction 赋值给self中的值
-        if sample_direction:
+        if not self.sample_direction:
             self.sample_direction = sample_direction
         print(sample_direction)
 
@@ -246,3 +264,114 @@ class Layout:
         row_end = area_dict[self._config.position_end_alpha]
         col_start = area_dict[self._config.position_start_digit]
         col_end = area_dict[self._config.position_end_digit]
+        self.sample_position_list += getattr(self, self.sample_direction)(row_start=row_start, row_end=row_end,
+                                                                          col_start=col_start, col_end=col_end)
+
+    def set_sample(self):
+        _len = len(self.sample_list)
+        length = len(self.sample_position_list)
+        if _len > length:
+            self.sample_list = self.sample_list[0:len(self.sample_position_list)]
+        elif _len < length:
+            self.sample_list += ["None_name" for _ in range(length - _len)]
+        for i in range(length):
+            self.set_values(sub_area=self.sample_position_list[i],
+                            area_value=self.sample_list[i],
+                            data_frame=self.sample_plate.modify_plate
+                            )
+
+    def down_right(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        # 获取位置信息
+        position_plate = self.list_plate()[0].position_plate
+        # 获取列表 想先取竖向 那就把竖向的列表化
+        col_range = [i for i in range(col_start - 1, col_end)]
+        # 返回值初始化
+        position_list = list()
+        for col_index in col_range:
+            # 获取位置信息
+            position_list += position_plate.iloc[row_start - 1:row_end, col_index].values.tolist()
+        return position_list
+
+    def up_left(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        # 获取位置信息
+        position_plate = self.list_plate()[0].position_plate
+        # 获取列表 想先取竖向 那就把竖向的列表化
+        col_range = [i for i in range(col_start - 1, col_end)][::-1]
+        # 返回值初始化
+        position_list = list()
+        for col_index in col_range:
+            # 获取位置信息
+            position_list += position_plate.iloc[row_start - 1:row_end, col_index].values.tolist()[::-1]
+        return position_list
+
+    def left_up(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        # 获取位置信息
+        position_plate = self.list_plate()[0].position_plate
+        # 获取列表 想先取竖向 那就把竖向的列表化
+        row_range = [i for i in range(row_start - 1, row_end)][::-1]
+        # 返回值初始化
+        position_list = list()
+        for row_index in row_range:
+            # 获取位置信息
+            position_list += position_plate.iloc[row_index, col_start - 1:col_end].values.tolist()[::-1]
+        return position_list
+
+    def right_down(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        # 获取位置信息
+        position_plate = self.list_plate()[0].position_plate
+        # 获取列表 想先取竖向 那就把竖向的列表化
+        row_range = [i for i in range(row_start - 1, row_end)]
+        # 返回值初始化
+        position_list = list()
+        for row_index in row_range:
+            # 获取位置信息
+            position_list += position_plate.iloc[row_index, col_start - 1:col_end].values.tolist()
+        return position_list
+
+    def up_right(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        # 获取位置信息
+        position_plate = self.list_plate()[0].position_plate
+        # 获取列表 想先取竖向 那就把竖向的列表化 right 不用反  left 反  down不用反  up反
+        col_range = [i for i in range(col_start - 1, col_end)]
+        # 返回值初始化
+        position_list = list()
+        for col_index in col_range:
+            # 获取位置信息
+            position_list += position_plate.iloc[row_start - 1:row_end, col_index].values.tolist()[::-1]
+        return position_list
+
+    def right_up(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        # 获取位置信息
+        position_plate = self.list_plate()[0].position_plate
+        # 获取列表 想先取竖向 那就把竖向的列表化 right 不用反  left 反  down不用反  up反
+        row_range = [i for i in range(row_start - 1, row_end)][::-1]
+        # 返回值初始化
+        position_list = list()
+        for row_index in row_range:
+            # 获取位置信息
+            position_list += position_plate.iloc[row_index, col_start - 1:col_end].values.tolist()
+        return position_list
+
+    def down_left(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        # 获取位置信息
+        position_plate = self.list_plate()[0].position_plate
+        # 获取列表 想先取竖向 那就把竖向的列表化 right 不用反  left 反  down不用反  up反
+        col_range = [i for i in range(col_start - 1, col_end)][::-1]
+        # 返回值初始化
+        position_list = list()
+        for col_index in col_range:
+            # 获取位置信息
+            position_list += position_plate.iloc[row_start - 1:row_end, col_index].values.tolist()
+        return position_list
+
+    def left_down(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        # 获取位置信息
+        position_plate = self.list_plate()[0].position_plate
+        # 获取列表 想先取竖向 那就把竖向的列表化 right 不用反  left 反  down不用反  up反
+        row_range = [i for i in range(row_start - 1, row_end)]
+        # 返回值初始化
+        position_list = list()
+        for row_index in row_range:
+            # 获取位置信息
+            position_list += position_plate.iloc[row_index, col_start - 1:col_end].values.tolist()[::-1]
+        return position_list
