@@ -47,6 +47,7 @@ class Layout_config:
         "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": self._config.down_left,
         "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": self._config.left_down,
     }
+
     # "竖向点样，横向延伸，A1-H1，A2-H2": "down_right",
     down_right = "down_right"
     # "横向点样，竖向延伸，A1-A12，B1-B12": "right_down",
@@ -63,3 +64,11 @@ class Layout_config:
     down_left = "down_left"
     # "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": "left_down",
     left_down = "left_down"
+
+    # items
+    items_dict = {
+        "p-Tau 217": "p-Tau 217",
+        "Amyloid Beta 1-40": "Amyloid Beta 1-40",
+        "Amyloid Beta 1-42": "Amyloid Beta 1-42"
+
+    }
