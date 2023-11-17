@@ -1591,3 +1591,31 @@ pipreqs ./ --encoding='iso-8859-1'
 pip install -r requirements.txt
 
 养成良好的编程习惯。
+
+
+
+## 2023.11.17
+
+### 除了`all()`函数，Python还提供了其他一些内置函数，如`any()`函数，它用于检查给定可迭代对象中的是否有至少一个元素为True。
+
+### 要从Excel加载数据到pandas（pd）中，你可以使用pandas的`read_excel()`函数。以下是一个基本的示例：
+
+
+```python
+import pandas as pd
+
+# 读取Excel文件
+data = pd.read_excel('your_file.xlsx')
+
+# 显示数据的前几行
+print(data.head())
+```
+在这个例子中，`'your_file.xlsx'`应替换为你的Excel文件的实际路径和文件名。该函数将返回一个pandas DataFrame，你可以使用这个DataFrame进行数据分析。
+
+如果你的Excel文件中有多个工作表，并且你希望指定一个特定的工作表，你可以这样做：
+
+
+```python
+data = pd.read_excel('your_file.xlsx', sheet_name='your_sheet_name')
+```
+在这里，`'your_sheet_name'`应替换为你想要加载的工作表的名称。

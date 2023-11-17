@@ -15,10 +15,8 @@ test_layout	文件名
 35	当前分钟
 56	当前秒钟
 """
-import re
-from pprint import pprint
 from unittest import TestCase
-from i_experimnet.bin.layout import Layout
+from i_experimnet.src.layout import Layout
 
 
 class TestLayout(TestCase):

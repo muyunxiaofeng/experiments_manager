@@ -52,4 +52,8 @@ class Json_Bean:
 
         return self.__dict__
 
+    def repair_para(self, var_name, var_value):
+        if var_value is not None:
+            self.__setattr__(var_name, var_value)
 
+        return self.__dict__

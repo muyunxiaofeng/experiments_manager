@@ -59,3 +59,30 @@ class Merge_plates:
                     jb.input_para(var_name=k, var_value=v)
 
                     self.mp.modify_plate.iloc[_row, _col] = jb.json_bean()
+
+    def re_merging(self, path):
+        """
+        提供一个
+        :param path:
+        :return:
+        """
+        # 加载
+        self.mp.load_excel(path)
+
+        for _row in range(self.mp.row):
+            for _col in range(self.mp.col):
+                for plate in self.merge_list:
+                    if _col == 0 and _row == 0:
+                        print(plate)
+                    # 获取值
+                    v = plate.modify_plate.iloc[_row, _col]
+                    # 获取引用
+                    k = plate.plate_name
+                    # 获取之前的json
+                    _json = self.mp.modify_plate.iloc[_row, _col]
+                    # 构建json_bean
+                    jb = Json_Bean(_json)
+                    # 插入参数  这里会将所有None不赋值
+                    jb.repair_para(var_name=k, var_value=v)
+
+                    self.mp.modify_plate.iloc[_row, _col] = jb.json_bean()

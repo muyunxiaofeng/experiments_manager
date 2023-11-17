@@ -15,30 +15,13 @@ digital_elisa	文件名
 24	当前分钟
 15	当前秒钟
 """
-import os
-import shutil
-from pprint import pprint
-
-import pandas as pd
+from i_experimnet.src.layout import Layout
 
 
-class Digital_Elisa:
-    def __init__(self, path=None):
-        self.path = path
-        self.keyword = "result"
-        self.target_folder_abs_path_list = []
-
-    def folder_handler(self):
-        for root, folder_list, file_list in os.walk(self.path):
-            for file in file_list:
-                file_abs_path = os.path.join(root, file)
-                if self.keyword in file_abs_path:
-                    self.target_folder_abs_path_list.append(file_abs_path)
-
-
-    def data_washing(self):
-        for target_folder_abs_path in self.target_folder_abs_path_list:
-            if ["xlsx", "excel", "xls"] in target_folder_abs_path:
-                if target_folder_abs_path.split(".")[-1] == "xls":
-                    shutil.copy(target_folder_abs_path, target_folder_abs_path + "x")  # 复制一个文件到一个文件或一个目录
-                    target_folder_abs_path = target_folder_abs_path + "x"
+class Digital_Elisa(Layout):
+    def __init__(self):
+        super().__init__()
+        # protocol
+        self.protocol_plate = Plate("protocol", self.plate)
+        self.CA_plate = Plate("CA", self.plate)
+        self.DA_plate = Plate("DA", self.plate)

@@ -90,3 +90,6 @@ class Plate:
         print("=" * 20, self.plate_name, "=" * 20)
         pprint(self.modify_plate)
         return "Plate class"
+
+    def load_excel(self, path):
+        self.modify_plate = pd.read_excel(path, index_col=0)

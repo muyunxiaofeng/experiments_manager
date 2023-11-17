@@ -20,7 +20,9 @@ layout_init 初始化布板方法
 
 import re
 
-from i_experimnet.bin.merge_plate import Merge_plates
+from datetime import datetime
+
+from i_experimnet.src.merge_plate import Merge_plates
 from i_experimnet.utils import alpha_calculator
 from i_experimnet.config.layout_config import Layout_config
 from i_experimnet.src.plate import Plate
@@ -28,12 +30,16 @@ from i_experimnet.src.plate import Plate
 
 class Layout:
     def __init__(self, plate=96):
+
+        self.layout_version = "V1.0.0"
         # 中间储存的一些信息
         self.sample_from = None
         self.sample_type = None
-
+        self.unit = None
         # result
         self.result = Merge_plates()
+        # 版型
+        self.plate = plate
 
         # 参数
         # 数值的模板
@@ -49,9 +55,6 @@ class Layout:
         # 项目
         self.items_plate = Plate("items_plate", self.plate)
 
-        # 版型
-        self.plate = plate
-
         # 一些字符串参数
         self._config = Layout_config()
 
@@ -65,16 +68,35 @@ class Layout:
         self.sample_direction = None
         # 样本位置的储存列表
         self.sample_position_list = list()
+        # 语句储存
+        self.input_path = self._config.input_txt_path + r"\input-" + datetime.now().strftime(
+            "%Y-%m-%d-%H-%M-%S") + "-" + self.layout_version + ".txt"
         # 启动函数
         self.layout()
 
     def layout(self):
+        """
+        调用的主流程
+        :return:
+        """
+        # 初始化
         self.layout_init()
+        # 输入
         self.help_layout()
+        # 展示
         for plate in self.list_plate():
             print(plate)
+        # 合并
+        self.result.merge_list = self.list_plate()
+        self.result.merging()
+        # 保存
+        self.layout_saving()
 
     def list_plate(self):
+        """
+        将所有属于Plate的实例以列表形式返回，便于merge
+        :return:
+        """
         # return [attrs for attr in dir(self) if isinstance(getattr(self, attr), Plate)]
         return [getattr(self, attr) for attr in dir(self) if isinstance(getattr(self, attr), Plate)]
 
@@ -86,9 +108,32 @@ class Layout:
 
         pass
 
+    def layout_saving(self):
+        """
+        储存布板信息到本地
+        V1.0.0 完成excel的储存
+        :return:
+        """
+        # 储存到excel
+        path = self._config.excel_saving_path
+        prefix = r"\layout-"
+        now = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        suffix = ".xlsx"
+        self.result.mp.modify_plate.to_excel(path + prefix + self.layout_version + "-" + now + suffix)
+
+    def input_saving(self, _input):
+        """
+        为方便复用 储存为txt
+        :param _input:
+        :return:
+        """
+        with open(self.input_path, mode="a", encoding="utf-8") as wr:
+            wr.write(_input)
+            wr.write("\n")
+
     def help_layout(self):
         """
-        根据输入的布板信息进行
+        根据输入的布板信息进行自动化梳理
         :return:
         """
         while 1:
@@ -103,14 +148,18 @@ class Layout:
                 return
             # 转成大写
             _input = _input.upper()
+            self.input_saving(_input)
             # 根据键入的内容分成不同的等式列表
             area_equation_list = _input.split(";")
             # 遍历等式进行分拣
             for area_equation in area_equation_list:
                 # 单位unit 处理
                 if "(" in area_equation:
-                    pass
-                    # self.unit = re.findall("\((.*/.*)\)", area_equation)
+                    unit, area = area_equation.split(":")
+                    self.unit = re.findall("\((.*/.*)\)", area)
+                    for sub_area in area.split(","):
+                        self.set_values(sub_area=sub_area, area_value=self.unit,
+                                        data_frame=self.unit_plate.modify_plate)
                     # todo 进行所有试验孔的单位分配  但是现在可能没有处理完布板信息 所以要在最后 放置一个end_layout 完成这个功能
                 # 布板信息的基础内容
                 # 等式左边为区域 区域列表  右侧为  值  不含单位
@@ -143,13 +192,15 @@ class Layout:
                             return
                         if item_num.isdecimal() and int(item_num) < len(item_dict):
                             item = list(item_dict.values())[int(item_num)]
-                            item_area = input("请输入项目范围，例：a1-a3,a4,a5，只输入Q退出：").strip()
+                            self.input_saving(item)
+                            item_area = input("请输入项目范围，例：a1-a3,a4,a5，只输入Q退出：").strip().upper()
                             if not item_area:
                                 print("不能输入空值~")
                                 continue
                             if item_area.upper() == "Q":
                                 return
                             else:
+                                self.input_saving(item_area)
                                 break
                     if item is not None and item_area is not None:
                         sub_area_list = item_area.split(",")
@@ -171,10 +222,11 @@ class Layout:
                             break
                         elif sample_input.isdecimal():
                             self.sample_list.append(sample_input)
+                            self.input_saving(sample_input)
 
                 elif "*" in area_equation:
                     # todo 这里是要调取布板信息的
-                    pass
+                    self.set_protocol()
                 elif "[" in area_equation:
                     # 将赋值部分进行处理
                     samples, area = area_equation.split(":")
@@ -187,10 +239,21 @@ class Layout:
                         self.sample_area_list(sub_area)
                         self.set_values(sub_area=sub_area, area_value=self._config.params_sample,
                                         data_frame=self.type_plate.modify_plate)
+                        self.set_values(sub_area=sub_area, area_value=self.sample_from,
+                                        data_frame=self.sample_from_plate.modify_plate)
+                        self.set_values(sub_area=sub_area, area_value=self.sample_type,
+                                        data_frame=self.sample_type_plate.modify_plate)
 
                     self.set_sample()
 
     def set_values(self, sub_area, area_value, data_frame: Plate):
+        """
+        根据给定的区域和值进行赋值，并储存到给定的dataframe中
+        :param sub_area: 选定的区域
+        :param area_value: 该区域的值
+        :param data_frame: 需要储存的dataframe 一般为modify——plate
+        :return: None
+        """
         if sub_area == self._config.all:
             row_start = 0
             row_end = data_frame.row
@@ -209,6 +272,11 @@ class Layout:
         print(data_frame)
 
     def area_split(self, area):
+        """
+        根据给定区域来分割，如果是A1这种单点区域则返回的字典坐标相同，如果是区域，则起始位置和终止位置的坐标会排序后给出
+        :param area: 给定的区域
+        :return: 输入区域的坐标索引int格式 可以用iloc来实现
+        """
         if "-" in area:
             position_start, position_end = area.split("-")
             # 获取字母部分
@@ -246,7 +314,15 @@ class Layout:
             }
 
     def sample_split(self, samples):
-        # [sample_name<sample_number~6>sample_type%sample_from:sample_direction=h1-h7]
+        """
+        将键入的样本分割不同的信息，分别储存，并存在self.sample_list中
+        :param samples: 样本输入信息
+        :return:
+        """
+        # [sample_name<sample_number~6>sample_type%sample_from]sample_direction:h1-h7]
+        prep_list = ["<", ">", "~", "%"]
+        if not all(prep in samples for prep in prep_list):
+            raise "输入有问题"
         # 样本分拆 样本名 “<”
         sample_name_prefix, samples = samples.split("<")
         # 样本编号 ~
@@ -261,6 +337,7 @@ class Layout:
         new_list = list()
         for sample_name in self.sample_list:
             new_list.append(f"{sample_name_prefix}-{sample_name}")
+        self.sample_list = new_list
         # 样本来源 %
         sample_type, samples = samples.split("%")
         self.sample_type = sample_type
@@ -282,14 +359,21 @@ class Layout:
                 return
             if _input.isdecimal() and int(_input) < len(sample_direction_dic):
                 self.sample_direction = list(sample_direction_dic.values())[int(_input)]
+                self.input_saving(self.sample_direction)
                 break
 
         # 将sample_direction 赋值给self中的值
         if not self.sample_direction:
             self.sample_direction = sample_direction
+            self.input_saving(self.sample_direction)
         print(sample_direction)
 
     def sample_area_list(self, area):
+        """
+        将给定的区域根据“”方向“”进行列表化，储存在self.sample_position_list
+        :param area: 给定的区域
+        :return:
+        """
         area_dict = self.area_split(area)
         # 修改值
         row_start = area_dict[self._config.position_start_alpha]
@@ -300,6 +384,10 @@ class Layout:
                                                                           col_start=col_start, col_end=col_end)
 
     def set_sample(self):
+        """
+        根据已经序列化的self.sample_list和self.sample_position_list 进行赋值
+        :return:
+        """
         _len = len(self.sample_list)
         length = len(self.sample_position_list)
         if _len > length:
@@ -312,10 +400,34 @@ class Layout:
                             data_frame=self.sample_plate.modify_plate
                             )
 
+    def set_protocol(self):
+        """
+        需要重写
+        :return:
+        """
+        print(self.layout_version)
+        return "None"
+
     def get_items_dict(self):
         return self._config.items_dict
 
     def down_right(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        """
+        根据不同方向进行序列化
+        "竖向点样，横向延伸，A1-H1，A2-H2": down_right,
+        "横向点样，竖向延伸，A1-A12，B1-B12": right_down,
+        "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": up_left,
+        "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": left_up,
+        "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": up_right,
+        "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": right_up,
+        "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": down_left,
+        "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": left_down,
+        :param row_start: 起始行
+        :param row_end: 终止行
+        :param col_start: 起始列
+        :param col_end: 终止列
+        :return: 序列化列表
+        """
         # 获取位置信息
         position_plate = self.list_plate()[0].position_plate
         # 获取列表 想先取竖向 那就把竖向的列表化
@@ -328,6 +440,22 @@ class Layout:
         return position_list
 
     def up_left(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        """
+        根据不同方向进行序列化
+        "竖向点样，横向延伸，A1-H1，A2-H2": down_right,
+        "横向点样，竖向延伸，A1-A12，B1-B12": right_down,
+        "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": up_left,
+        "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": left_up,
+        "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": up_right,
+        "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": right_up,
+        "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": down_left,
+        "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": left_down,
+        :param row_start: 起始行
+        :param row_end: 终止行
+        :param col_start: 起始列
+        :param col_end: 终止列
+        :return: 序列化列表
+        """
         # 获取位置信息
         position_plate = self.list_plate()[0].position_plate
         # 获取列表 想先取竖向 那就把竖向的列表化
@@ -340,6 +468,22 @@ class Layout:
         return position_list
 
     def left_up(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        """
+        根据不同方向进行序列化
+        "竖向点样，横向延伸，A1-H1，A2-H2": down_right,
+        "横向点样，竖向延伸，A1-A12，B1-B12": right_down,
+        "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": up_left,
+        "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": left_up,
+        "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": up_right,
+        "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": right_up,
+        "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": down_left,
+        "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": left_down,
+        :param row_start: 起始行
+        :param row_end: 终止行
+        :param col_start: 起始列
+        :param col_end: 终止列
+        :return: 序列化列表
+        """
         # 获取位置信息
         position_plate = self.list_plate()[0].position_plate
         # 获取列表 想先取竖向 那就把竖向的列表化
@@ -352,6 +496,22 @@ class Layout:
         return position_list
 
     def right_down(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        """
+        根据不同方向进行序列化
+        "竖向点样，横向延伸，A1-H1，A2-H2": down_right,
+        "横向点样，竖向延伸，A1-A12，B1-B12": right_down,
+        "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": up_left,
+        "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": left_up,
+        "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": up_right,
+        "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": right_up,
+        "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": down_left,
+        "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": left_down,
+        :param row_start: 起始行
+        :param row_end: 终止行
+        :param col_start: 起始列
+        :param col_end: 终止列
+        :return: 序列化列表
+        """
         # 获取位置信息
         position_plate = self.list_plate()[0].position_plate
         # 获取列表 想先取竖向 那就把竖向的列表化
@@ -364,6 +524,22 @@ class Layout:
         return position_list
 
     def up_right(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        """
+        根据不同方向进行序列化
+        "竖向点样，横向延伸，A1-H1，A2-H2": down_right,
+        "横向点样，竖向延伸，A1-A12，B1-B12": right_down,
+        "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": up_left,
+        "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": left_up,
+        "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": up_right,
+        "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": right_up,
+        "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": down_left,
+        "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": left_down,
+        :param row_start: 起始行
+        :param row_end: 终止行
+        :param col_start: 起始列
+        :param col_end: 终止列
+        :return: 序列化列表
+        """
         # 获取位置信息
         position_plate = self.list_plate()[0].position_plate
         # 获取列表 想先取竖向 那就把竖向的列表化 right 不用反  left 反  down不用反  up反
@@ -376,6 +552,22 @@ class Layout:
         return position_list
 
     def right_up(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        """
+        根据不同方向进行序列化
+        "竖向点样，横向延伸，A1-H1，A2-H2": down_right,
+        "横向点样，竖向延伸，A1-A12，B1-B12": right_down,
+        "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": up_left,
+        "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": left_up,
+        "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": up_right,
+        "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": right_up,
+        "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": down_left,
+        "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": left_down,
+        :param row_start: 起始行
+        :param row_end: 终止行
+        :param col_start: 起始列
+        :param col_end: 终止列
+        :return: 序列化列表
+        """
         # 获取位置信息
         position_plate = self.list_plate()[0].position_plate
         # 获取列表 想先取竖向 那就把竖向的列表化 right 不用反  left 反  down不用反  up反
@@ -388,6 +580,22 @@ class Layout:
         return position_list
 
     def down_left(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        """
+        根据不同方向进行序列化
+        "竖向点样，横向延伸，A1-H1，A2-H2": down_right,
+        "横向点样，竖向延伸，A1-A12，B1-B12": right_down,
+        "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": up_left,
+        "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": left_up,
+        "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": up_right,
+        "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": right_up,
+        "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": down_left,
+        "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": left_down,
+        :param row_start: 起始行
+        :param row_end: 终止行
+        :param col_start: 起始列
+        :param col_end: 终止列
+        :return: 序列化列表
+        """
         # 获取位置信息
         position_plate = self.list_plate()[0].position_plate
         # 获取列表 想先取竖向 那就把竖向的列表化 right 不用反  left 反  down不用反  up反
@@ -400,6 +608,22 @@ class Layout:
         return position_list
 
     def left_down(self, row_start: int, row_end: int, col_start: int, col_end: int):
+        """
+        根据不同方向进行序列化
+        "竖向点样，横向延伸，A1-H1，A2-H2": down_right,
+        "横向点样，竖向延伸，A1-A12，B1-B12": right_down,
+        "反向使用，竖向点样，横向延伸，H12-A12，H11-A11": up_left,
+        "反向使用，横向点样，竖向延伸，H12-H1，G12-G1": left_up,
+        "侧向使用，横向点样，竖向延伸，H1-A1，H2-A2": up_right,
+        "侧向使用，竖向点样，横向延伸，H1-H12，G1-G12": right_up,
+        "反向侧向使用，横向点样，竖向延伸，A12-H12，A11-H11": down_left,
+        "反向侧向使用，竖向点样，横向延伸，A12-A1，B12-B1": left_down,
+        :param row_start: 起始行
+        :param row_end: 终止行
+        :param col_start: 起始列
+        :param col_end: 终止列
+        :return: 序列化列表
+        """
         # 获取位置信息
         position_plate = self.list_plate()[0].position_plate
         # 获取列表 想先取竖向 那就把竖向的列表化 right 不用反  left 反  down不用反  up反
