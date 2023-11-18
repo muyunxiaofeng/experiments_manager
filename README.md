@@ -1619,3 +1619,150 @@ print(data.head())
 data = pd.read_excel('your_file.xlsx', sheet_name='your_sheet_name')
 ```
 在这里，`'your_sheet_name'`应替换为你想要加载的工作表的名称。
+
+
+
+
+
+### `drop_duplicates()` 是 pandas 库中的一个函数，用于在 DataFrame 中删除重复的行。以下是使用 `drop_duplicates()` 函数的一些示例：
+
+1. 删除所有重复行：
+
+
+```python
+import pandas as pd
+
+data = {'A': [1, 2, 3, 4], 'B': [5, 6, 7, 8]}
+df = pd.DataFrame(data)
+
+df = df.drop_duplicates()
+```
+2. 根据某一列或几列删除重复行：
+
+
+```python
+import pandas as pd
+
+data = {'A': [1, 2, 3, 4], 'B': [5, 6, 7, 8]}
+df = pd.DataFrame(data)
+
+df = df.drop_duplicates(subset=['A'])  # 根据列 'A' 删除重复行
+```
+3. 根据多个列删除重复行：
+
+
+```python
+import pandas as pd
+
+data = {'A': [1, 2, 3, 4], 'B': [5, 6, 7, 8], 'C': [1, 2, 3, 4]}
+df = pd.DataFrame(data)
+
+df = df.drop_duplicates(subset=['A', 'B'])  # 根据列 'A' 和 'B' 删除重复行
+```
+4. 指定保留重复行的规则：
+
+
+```python
+import pandas as pd
+
+data = {'A': [1, 2, 2, 3], 'B': [5, 6, 6, 7]}
+df = pd.DataFrame(data)
+
+df = df.drop_duplicates(keep='first')  # 保留第一个出现的重复行，删除后续出现的重复行
+```
+
+### 要创建一个名为items和path的空DataFrame，您可以使用以下代码：
+
+
+```python
+import pandas as pd
+
+# 创建一个空的DataFrame
+df = pd.DataFrame(columns=['items', 'path'])
+
+print(df)
+```
+在这个例子中，我们使用pandas的DataFrame函数创建一个空的DataFrame，并指定列名为'items'和'path'。结果将是一个没有任何行数据的空DataFrame。
+
+### 在Python的pandas库中，你可以使用`append()`函数将数据添加到DataFrame的末尾。以下是一个简单的示例：
+
+
+```python
+import pandas as pd
+
+# 创建一个DataFrame
+df = pd.DataFrame({
+   'A': ['A0', 'A1', 'A2', 'A3'],
+   'B': ['B0', 'B1', 'B2', 'B3'],
+   'C': ['C0', 'C1', 'C2', 'C3'],
+   'D': ['D0', 'D1', 'D2', 'D3']},
+   index=[0, 1, 2, 3])
+
+# 创建一个新的行数据
+new_data = pd.Series(['A4', 'B4', 'C4', 'D4'], index=['A', 'B', 'C', 'D'])
+
+# 使用append()函数将新数据添加到DataFrame的末尾
+df = df.append(new_data)
+
+print(df)
+```
+在这个例子中，我们首先创建了一个DataFrame `df`，然后创建了一个新的行数据 `new_data`。我们使用`append()`函数将 `new_data` 添加到 `df` 的末尾。最后，我们打印出更新后的 `df`。
+
+
+
+### `append()` 函数的返回值是包含新添加的行数据的整个新 DataFrame。这意味着，当你使用 `append()` 函数将一行数据添加到 DataFrame 时，该函数将返回一个包含新添加的数据和原有数据的完整 DataFrame。你可以将这个返回值存储在一个变量中，以便后续使用。
+
+以下是一个简单的示例：
+
+
+```python
+import pandas as pd
+
+# 创建一个空的 DataFrame
+df = pd.DataFrame(columns=['items', 'path'])
+
+# 添加一行数据到 DataFrame
+new_row = {'items': 'item1', 'path': 'path1'}
+new_df = df.append(new_row, ignore_index=True)
+
+print(new_df)
+```
+在这个例子中，我们首先创建了一个空的 DataFrame `df`。然后，我们使用 `append()` 函数将一个包含新数据的行添加到 DataFrame 中，并将结果存储在变量 `new_df` 中。最后，我们打印出新的 DataFrame `new_df`，它包含新添加的行数据。
+
+
+
+如果你想在原始DataFrame中进行修改，而不是创建一个新的DataFrame，你可以使用`loc`或`iloc`方法来添加新行。
+
+使用`loc`方法，你可以通过行标签来添加新行。下面是一个示例：
+
+
+```python
+import pandas as pd
+
+# 创建一个包含两行数据的 DataFrame
+df = pd.DataFrame({'items': ['item1', 'item2'], 'path': ['path1', 'path2']})
+
+# 添加一行数据到 DataFrame
+new_row = pd.Series(['item3', 'path3'], index=['items', 'path'])
+df = df.loc[df.index.max() + 1] = new_row
+
+print(df)
+```
+在这个例子中，我们首先创建了一个包含两行数据的DataFrame `df`。然后，我们使用`loc`方法通过行标签来添加新行。我们使用`df.index.max()`来获取最后一行的索引，然后将其加1作为新行的索引，并将新行数据赋值给该索引。最后，我们打印出新的DataFrame `df`，它包含新添加的行数据。
+
+另一种方法是使用`iloc`方法通过整数位置来添加新行。以下是一个示例：
+
+
+```python
+import pandas as pd
+
+# 创建一个包含两行数据的 DataFrame
+df = pd.DataFrame({'items': ['item1', 'item2'], 'path': ['path1', 'path2']})
+
+# 添加一行数据到 DataFrame
+new_row = pd.Series(['item3', 'path3'])
+df = df.iloc[2] = new_row
+
+print(df)
+```
+在这个例子中，我们首先创建了一个包含两行数据的DataFrame `df`。然后，我们使用`iloc`方法通过整数位置来添加新行。我们使用`df.shape[0]`来获取DataFrame的行数，并将其加1作为新行的位置，并将新行数据赋值给该位置。最后，我们打印出新的DataFrame `df`，它包含新添加的行数据。
