@@ -1766,3 +1766,66 @@ df = df.iloc[2] = new_row
 print(df)
 ```
 在这个例子中，我们首先创建了一个包含两行数据的DataFrame `df`。然后，我们使用`iloc`方法通过整数位置来添加新行。我们使用`df.shape[0]`来获取DataFrame的行数，并将其加1作为新行的位置，并将新行数据赋值给该位置。最后，我们打印出新的DataFrame `df`，它包含新添加的行数据。
+
+## 2023.11.18
+
+这个错误是因为你可能正在使用一个较旧版本的Pandas库，该版本中`DataFrame`对象没有一个`append`方法。这是一个常见的错误，特别是在使用旧版本的Python或Pandas时。
+
+如果你正在使用的是Pandas 1.2.0或更高版本，那么这个错误不应该出现，因为`DataFrame`对象应该具有`append`方法。
+
+### 解决方案是确保你正在使用较新版本的Pandas库。你可以通过以下步骤来升级Pandas库：
+
+1. 打开命令行或终端。
+2. 输入以下命令来卸载当前版本的Pandas库：
+```arduino
+pip uninstall pandas
+```
+3. 输入以下命令来安装最新版本的Pandas库：
+```bash
+pip install pandas --upgrade
+```
+4. 重新运行你的代码。
+
+如果你不确定你正在使用哪个版本的Pandas库，可以尝试在命令行或终端中输入以下命令来查看已安装的Pandas版本：
+
+
+```css
+pip show pandas
+```
+确保你安装的是最新版本，然后重新运行你的代码，看看问题是否得到解决。
+
+
+
+
+
+### 这个错误信息来自Pandas库，表明你正在试图用一组标量值（即单一的数字或字符串，而不是数组或列表）创建一个`DataFrame`，但没有提供一个索引。
+
+在你的代码中，`self.params_df = pd.DataFrame(kwargs, columns=list(kwargs.keys()))`这一行正在尝试创建一个`DataFrame`。`kwargs`是一个字典，它的键是参数名，值是参数值。看起来像这样：
+
+
+```python
+kwargs = {'protocol': '0.5 μg/mL'}
+```
+当你尝试使用这个字典创建一个`DataFrame`时，Pandas试图将字典的值转换为数据框的行。但是，字典的值是标量值（在这种情况下是一个字符串），而不是数组或列表。因此，Pandas需要一个索引来对应这些标量值。如果没有提供索引，就会出现这个错误。
+
+解决这个问题的一种方法是将标量值转换为列表。这样就可以创建一个数据框，其中每一行都是字典的一个条目。你可以通过以下方式将字典的值转换为列表：
+
+
+```python
+kwargs_list = [list(v) for v in kwargs.values()]
+```
+然后，你可以使用这个列表和字典的键来创建`DataFrame`：
+
+
+```python
+self.params_df = pd.DataFrame(kwargs_list, columns=list(kwargs.keys()))
+```
+这样，你的代码就会像这样：
+
+
+```python
+kwargs = {'protocol': '0.5 μg/mL'}
+kwargs_list = [list(v) for v in kwargs.values()]
+self.params_df = pd.DataFrame(kwargs_list, columns=list(kwargs.keys()))
+```
+这应该能解决你的问题。

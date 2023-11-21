@@ -19,6 +19,6 @@ add_info_config	文件名
 
 class Info_config:
     root_path = r"../"
+    info = r"files/info/"
+    backup = r"backup/"
     root_file = root_path + r"files/info/root.xlsx"
-
-
