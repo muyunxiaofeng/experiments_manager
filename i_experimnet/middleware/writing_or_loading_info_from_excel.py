@@ -15,9 +15,12 @@ loading_info_from_excel	文件名
 17	当前分钟
 01	当前秒钟
 """
+import os.path
 import shutil
+from datetime import datetime
 
 import pandas as pd
+from openpyxl import workbook
 
 from i_experimnet.config.info_config import Info_config as _config
 
@@ -33,13 +36,20 @@ class Excel_info:
         self.rooting()
 
     def rooting(self):
+        if not os.path.exists(_config.root_file):
+            if not os.path.exists(_config.root_path + _config.info):
+                os.makedirs(_config.root_path + _config.info)
+            wb = workbook.Workbook()
+            wb.save(_config.root_file)
         # 初始化加载目录的根表
         self.root = pd.read_excel(_config.root_file, index_col=0)
         # 如果是空的就新建一个出来
         if self.root.empty:
             self.root = pd.DataFrame(columns=['items', 'path'])
+            return
         # 便于查询转化为dictionary
         self.root_dict = self.root.to_dict()
+        return self.root
 
     def __root_add(self, items, path):
         """
@@ -48,6 +58,8 @@ class Excel_info:
         :param path: 项目储存的路径
         :return: None
         """
+        if not os.path.exists(_config.root_file):
+            os.makedirs(_config.root_file)
         # 刷新根表
         self.root = pd.read_excel(_config.root_file, index_col=0)
         # 构建新数据行的字典
@@ -63,7 +75,7 @@ class Excel_info:
             # 使用append()函数将新数据添加到DataFrame的末尾
             self.root = pd.concat([self.root, new_data], ignore_index=True)
         # 项目去重
-        self.root.drop_duplicates()
+        self.root.drop_duplicates(inplace=True)
         # 打印项目根表
         print(self.root)
         # 储存根表
@@ -90,19 +102,64 @@ class Excel_info:
             [_config.root_path, _config.info, _config.backup, f"{now}-{item}.xlsx"])
 
         print(kwargs)
-        if item in list(self.root_dict.keys()):
-            self.params_df = pd.read_excel(self.root_dict[item], index_col=0)
-            new_data = pd.DataFrame(list(kwargs.values()), columns=self.params_df.columns)
+        # 输入的字符转化为字符串
+        for kwarg in kwargs:
+            kwargs[kwarg] = f"{kwargs[kwarg]}"
+        # 如果已经存在在目录列表中
+        # 查找'item'的行号
+        row_number = self.root[self.root['items'] == item]
+        if row_number.empty:
+            # 如果没有表就新建一个
+            # 新建一个空表
+            self.params_df = pd.DataFrame(columns=list(kwargs.keys()))
+            # 一个新的数据
+            new_data = pd.DataFrame([list(kwargs.values())], columns=list(kwargs.keys()))
+            # 拼接数据
             self.params_df = pd.concat([self.params_df, new_data], ignore_index=True)
+            # 新建数据表
             self.__root_add(item, new_path)
-            shutil.copy2(new_path, back_path)
         else:
+            # 如果已经存在了
+            # 获取储存过的路径
+            path = row_number.loc[0, "path"]
+
+            # 打开历史存储的参数
+            self.params_df = pd.read_excel(path, index_col=0)
+
+            # 撰写新的 data 优先遵从列表导入
             if args:
-                self.params_df = pd.DataFrame(args, columns=list(kwargs.keys()))
+                new_data = pd.DataFrame(args, columns=self.params_df.columns)
             else:
-                self.params_df = pd.DataFrame(list(kwargs.values()), columns=list(kwargs.keys()))
-        print(self.params_df)
+                new_data = pd.DataFrame([list(kwargs.values())], columns=self.params_df.columns)
+            # 合并新旧数据
+            self.params_df = pd.concat([self.params_df, new_data], ignore_index=True)
+            # 备份旧数据
+            shutil.copy2(new_path, back_path)
+
+        # 去重
+        self.params_df.drop_duplicates(inplace=True, keep="first")
+        # 打印新表
+        print(self.params_df.to_string())
+        # 保存
         self.params_df.to_excel(new_path)
+        print(new_data)
+        return new_data
 
     def params_select(self, item):
-        pass
+        """
+        根据根表查询一个列表 进行选择项目 并查询该项目对应的表
+        :param item: 查询的表
+        :return:
+        """
+        # 如果已经存在在目录列表中
+        # 查找'item'的行号
+        row_number = self.root[self.root['items'] == item]
+        if row_number.empty:
+            return
+        else:
+            # 如果已经存在了
+            # 获取储存过的路径
+            path = row_number.loc[0, "path"]
+            # 打开历史存储的参数
+            self.params_df = pd.read_excel(path, index_col=0)
+            return self.params_df

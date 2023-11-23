@@ -83,6 +83,8 @@ class Layout:
         self.layout_init()
         # 输入
         self.help_layout()
+
+    def merging_and_saving(self):
         # 展示
         for plate in self.list_plate():
             print(plate)

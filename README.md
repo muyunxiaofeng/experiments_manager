@@ -1829,3 +1829,73 @@ kwargs_list = [list(v) for v in kwargs.values()]
 self.params_df = pd.DataFrame(kwargs_list, columns=list(kwargs.keys()))
 ```
 这应该能解决你的问题。
+
+## 2023.11.21
+
+### 在 Pandas 中，你可以通过使用列的名字或者列的索引来获取 DataFrame 中的某一列。
+
+1. 使用列的名字:
+
+
+```python
+df['column_name']
+```
+在这里，`df` 是你的 DataFrame，而 `'column_name'` 是你想要获取的列的名字。
+
+2. 使用列的索引：
+
+
+```python
+df.columns[index]
+```
+在这里，`df` 是你的 DataFrame，而 `index` 是你想要获取的列的索引。请注意，索引是从 0 开始的。所以，如果你想要获取第一列，你应该使用 `df.columns[0]`。
+
+下面是一个完整的例子：
+
+
+```python
+import pandas as pd
+
+# 创建一个 DataFrame
+data = {'Name': ['Alice', 'Bob', 'Charlie', 'David'],
+        'Age': [25, 30, 35, 40]}
+df = pd.DataFrame(data)
+
+# 获取 'Name' 列
+names = df['Name']
+print(names)
+```
+这将输出：
+
+
+```bash
+0    Alice
+1      Bob
+2    Charlie
+3     David
+Name: Name, dtype: object
+```
+
+## 2023.11.22
+
+### 在Python中，字典对象的`update()`方法用于合并字典。它接受一个字典或者任何可迭代的键值对序列，然后将这些键值对添加到当前字典中。如果键已经存在于字典中，那么对应的值将被更新为提供的值。
+
+以下是`update()`方法的一些示例：
+
+
+```python
+# 创建一个字典
+dict1 = {"a": 1, "b": 2, "c": 3}
+
+# 使用另一个字典更新
+dict2 = {"a": 4, "b": 5, "d": 6}
+dict1.update(dict2)
+print(dict1)  # 输出: {'a': 4, 'b': 5, 'c': 3, 'd': 6}
+
+# 使用键值对序列更新
+dict1.update([("c", 7), ("e", 8)])
+print(dict1)  # 输出: {'a': 4, 'b': 5, 'c': 7, 'd': 6, 'e': 8}
+```
+在上述例子中，如果键已经存在于字典中，那么对应的值将被更新为提供的值。如果键不存在于字典中，那么新的键值对将被添加到字典中。
+
+注意，`update()`方法接受两个参数，第一个参数是用于更新的字典或可迭代对象，第二个参数是可选的，它指定用于更新的字典或可迭代对象中的某个特定元素。但是在Python的更新版本中，这个特性可能已经不再适用。因此，在实际使用中需要注意更新的语法和Python版本。

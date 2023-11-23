@@ -20,8 +20,13 @@ from pprint import pprint
 from i_experimnet.bin import digital_elisa
 
 
+# class TestDigital_Elisa(TestCase):
+#     def test_folder_handler(self):
+#         de = digital_elisa.Digital_Elisa(path=r"F:\W20231108")
+#         de.folder_handler()
+#         pprint(de.target_folder_abs_path_list)
+
+
 class TestDigital_Elisa(TestCase):
-    def test_folder_handler(self):
-        de = digital_elisa.Digital_Elisa(path=r"F:\W20231108")
-        de.folder_handler()
-        pprint(de.target_folder_abs_path_list)
+    def test_guidance(self):
+        d = digital_elisa.Digital_Elisa()

@@ -48,6 +48,7 @@ class Json_Bean:
             traceback.format_exc()
 
     def input_para(self, var_name, var_value):
+
         self.__setattr__(var_name, var_value)
 
         return self.__dict__
