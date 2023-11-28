@@ -56,7 +56,10 @@ class Merge_plates:
                     # 构建json_bean
                     jb = Json_Bean(_json)
                     # 插入参数
-                    jb.input_para(var_name=k, var_value=v)
+                    if isinstance(v, json):
+                        jb.load_json_bean(v)
+                    else:
+                        jb.input_para(var_name=k, var_value=v)
 
                     self.mp.modify_plate.iloc[_row, _col] = jb.json_bean()
 

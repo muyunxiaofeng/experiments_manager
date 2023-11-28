@@ -15,6 +15,9 @@ digital_elisa	文件名
 24	当前分钟
 15	当前秒钟
 """
+import json
+
+from i_experimnet.src.plate import Plate
 from i_experimnet.src.layout import Layout
 from i_experimnet.middleware.writing_or_loading_info_from_excel import Excel_info
 
@@ -24,7 +27,7 @@ class Digital_Elisa(Layout):
         # 常规引导布板
         super().__init__()
         # protocol
-        # self.protocol_plate = Plate("protocol", self.plate)
+        self.protocol_plate = Plate("protocol", self.plate)
         # 加载储存过的表格
         self.saving_list = Excel_info()
         # 特殊引导布板
@@ -37,10 +40,27 @@ class Digital_Elisa(Layout):
             return self.saving_list.root
 
     def guidance(self):
-        if self.show_saving_dataframe() is None:
-            self.new_params()
-        else:
-            self.select_params()
+        while 1:
+            print("选择参数")
+            if self.show_saving_dataframe() is None:
+                select_par = self.new_params()
+            else:
+                select_par = self.select_params()
+            if select_par is None:
+                break
+            print(select_par.to_string())
+            select_par_json = json.dumps(select_par.to_dict())
+
+            area = input("请输入区域，只输入Q退出：").strip()
+            if not area:
+                print("不能输入空值~")
+            else:
+                # [] 列表化
+                sub_area_list = area.split(",")
+                for sub_area in sub_area_list:
+                    self.set_values(sub_area, select_par_json, self.protocol_plate.modify_plate)
+                    print(self.protocol_plate)
+        print(self.protocol_plate)
 
     def new_params(self):
         kwargs = dict()
@@ -77,21 +97,41 @@ class Digital_Elisa(Layout):
                 else:
                     kwargs[arg] = value
 
-        self.saving_list.params_add(item=param, **kwargs)
+        return self.saving_list.params_add(item=param, **kwargs)
 
     def select_params(self):
         while 1:
+            # 获取根表
             root_dataframe = self.saving_list.root
             print(root_dataframe["items"])
 
             # 提示用户输入
-            _input = input("请输入要选择的序号，只输入Q退出：").strip()
+            _input = input("请输入要选择的序号，只输入Q退出，输入N新建：").strip()
             if not _input:
                 print("不能输入空值~")
                 continue
             if _input.upper() == "Q":
                 return
+            if _input.upper() == "N":
+                return self.new_params()
+                # todo
             if _input.isdecimal() and int(_input) < root_dataframe.shape[0]:
+                # 选择项目
                 select_item = root_dataframe.loc[int(_input), "items"]
                 print(select_item)
-                self.saving_list.params_select(s)
+                param_dataframe = self.saving_list.params_select(select_item)
+                while 1:
+                    print(param_dataframe.to_string())
+
+                    # 提示用户输入
+                    select_para = input("请输入要选择的序号，只输入Q退出，输入N新建：").strip()
+                    if not select_para:
+                        print("不能输入空值~")
+                        continue
+                    if select_para.upper() == "Q":
+                        return
+                    if select_para.upper() == "N":
+                        args = input("""请输入要新增的参数，用","分割""").strip().split(",")
+                        return self.saving_list.params_add(item=select_item, *args)
+                    if select_para.isdecimal() and int(_input) < param_dataframe.shape[0]:
+                        return param_dataframe.iloc[int(select_para)]
