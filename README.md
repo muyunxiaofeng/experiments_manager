@@ -72,6 +72,10 @@ pipreqs D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\support\  --e
 ## bin
 
 1. 实现对多组数据的的离散型筛选的功能
+2. digital_elisa: 
+   1. 2023.11.28：
+   2. 
+
 
 ## utils
 
@@ -1899,3 +1903,102 @@ print(dict1)  # 输出: {'a': 4, 'b': 5, 'c': 7, 'd': 6, 'e': 8}
 在上述例子中，如果键已经存在于字典中，那么对应的值将被更新为提供的值。如果键不存在于字典中，那么新的键值对将被添加到字典中。
 
 注意，`update()`方法接受两个参数，第一个参数是用于更新的字典或可迭代对象，第二个参数是可选的，它指定用于更新的字典或可迭代对象中的某个特定元素。但是在Python的更新版本中，这个特性可能已经不再适用。因此，在实际使用中需要注意更新的语法和Python版本。
+
+## 2023.11.28
+
+- [ ] 需要补充完成输入记录
+- [ ] 测试json模式是否生效
+- [ ] 增加项目选项
+- [ ] 增加保存布板功能
+- [ ] 测试布板功能
+- [ ] 
+
+```
+Launching unittests with arguments python -m unittest test_digital_elisa.TestDigital_Elisa in D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\bin
+
+
+==================== finally ====================
+     1     2     3     4     5     6     7     8     9     10    11    12
+A  None  None  None  None  None  None  None  None  None  None  None  None
+B  None  None  None  None  None  None  None  None  None  None  None  None
+C  None  None  None  None  None  None  None  None  None  None  None  None
+D  None  None  None  None  None  None  None  None  None  None  None  None
+E  None  None  None  None  None  None  None  None  None  None  None  None
+F  None  None  None  None  None  None  None  None  None  None  None  None
+G  None  None  None  None  None  None  None  None  None  None  None  None
+H  None  None  None  None  None  None  None  None  None  None  None  None
+Plate class
+例： a1-a3,a4,a5=0;b12=1000;(fg/mL); ^curve:a1-h6;^sample:a7-h7,a7-h12;{进入分散样本命名方法}; [sample_name<sample_number~6>sample_type%sample_from]sample_direction:h1-h7;
+请输入位置信息，用区域间用分号隔开，只输入Q退出：选择参数
+0    digital_elisa_protocol
+1                     beads
+Name: items, dtype: object
+请输入要选择的序号，只输入Q退出，输入N新建：beads
+
+
+Ran 1 test in 4.756s
+
+FAILED (errors=1)
+
+Error
+Traceback (most recent call last):
+  File "C:\Users\41379\experiments_manager\Lib\site-packages\pandas\core\indexes\base.py", line 3790, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 152, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 181, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\_libs\hashtable_class_helper.pxi", line 2606, in pandas._libs.hashtable.Int64HashTable.get_item
+  File "pandas\_libs\hashtable_class_helper.pxi", line 2630, in pandas._libs.hashtable.Int64HashTable.get_item
+KeyError: 0
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\bin\test_digital_elisa.py", line 32, in test_guidance
+    d = digital_elisa.Digital_Elisa()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\bin\digital_elisa.py", line 34, in __init__
+    self.guidance()
+  File "D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\bin\digital_elisa.py", line 48, in guidance
+    select_par = self.select_params()
+                 ^^^^^^^^^^^^^^^^^^^^
+  File "D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\bin\digital_elisa.py", line 122, in select_params
+    param_dataframe = self.saving_list.params_select(select_item)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\middleware\writing_or_loading_info_from_excel.py", line 162, in params_select
+    path = row_number.loc[0, "path"]
+           ~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "C:\Users\41379\experiments_manager\Lib\site-packages\pandas\core\indexing.py", line 1146, in __getitem__
+    return self.obj._get_value(*key, takeable=self._takeable)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\41379\experiments_manager\Lib\site-packages\pandas\core\frame.py", line 4012, in _get_value
+    row = self.index.get_loc(index)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\41379\experiments_manager\Lib\site-packages\pandas\core\indexes\base.py", line 3797, in get_loc
+    raise KeyError(key) from err
+KeyError: 0
+
+```
+
+### 如果你想在构建DataFrame时，列名为10个，但值只有6个，想要用`None`补齐其他的值，可以使用`pandas`库来实现。下面是一个示例代码：
+
+
+```python
+import pandas as pd
+
+# 假设你有10个列名，但只有6个值
+columns = ['col1', 'col2', 'col3', 'col4', 'col5', 'col6', 'col7', 'col8', 'col9', 'col10']
+values = ['value1', 'value2', 'value3', 'value4', 'value5', 'value6']
+
+# 创建一个空的DataFrame
+df = pd.DataFrame(columns=columns)
+
+# 填充值，将其他位置用None补齐
+for i, value in enumerate(values):
+    df.at[i, 'col'+str(i+1)] = value
+    for j in range(len(columns) - len(values)):
+        df.at[i+j+1, columns[i+j+1]] = None
+
+print(df)
+```
+这段代码首先创建了一个空的DataFrame，然后使用循环逐个填充值，将其他位置用`None`补齐。在循环中，通过`at`方法访问DataFrame的特定位置并赋值。请注意，这里假设列名和值的顺序是对应的。如果实际情况不同，你需要相应地调整代码。

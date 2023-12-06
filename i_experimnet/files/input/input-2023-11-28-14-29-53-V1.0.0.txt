@@ -1,0 +1,2 @@
+   coating  coating_concentration coating_concentration_unit blocking blocking_concentration blocking_concentration_unit                     beads_treated coating_time blocking_time                      before_storage                         storage
+0  BY40101                     20                      μg/mL    CE210                   0.2%                         w/v  0.1M MES pH=5.20 washing 3 times          3 h           3 h  0.02 M PBST pH=7.4 washing 3 times  0.02M PBST + 0.25% proclin 300

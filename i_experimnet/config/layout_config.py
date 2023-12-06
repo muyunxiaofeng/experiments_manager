@@ -97,4 +97,4 @@ class Layout_config:
     # 键入语句的储存
     input_txt_path = r"D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\files\input"
     # excel_saving_path
-    excel_saving_path = r"D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\files"
+    excel_saving_path = r"D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\i_experimnet\files\output"

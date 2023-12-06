@@ -15,6 +15,7 @@ merge_plate	文件名
 04	当前分钟
 18	当前秒钟
 """
+import json
 
 from i_experimnet.src.bean.json_bean import Json_Bean
 from i_experimnet.src.plate import Plate
@@ -56,7 +57,8 @@ class Merge_plates:
                     # 构建json_bean
                     jb = Json_Bean(_json)
                     # 插入参数
-                    if isinstance(v, json):
+
+                    if self.is_json(v):
                         jb.load_json_bean(v)
                     else:
                         jb.input_para(var_name=k, var_value=v)
@@ -89,3 +91,13 @@ class Merge_plates:
                     jb.repair_para(var_name=k, var_value=v)
 
                     self.mp.modify_plate.iloc[_row, _col] = jb.json_bean()
+
+    @staticmethod
+    def is_json(string):
+        if string is None:
+            return False
+        try:
+            json.loads(string)
+            return True
+        except ValueError:
+            return False

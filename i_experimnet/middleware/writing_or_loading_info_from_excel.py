@@ -94,6 +94,7 @@ class Excel_info:
         :param kwargs: 字典参数
         :return: 无
         """
+
         # 拼接新生成表的路径
         new_path = "".join([_config.root_path, _config.info, f"{item}.xlsx"])
         # 当前时间，并准备进行备份
@@ -121,16 +122,30 @@ class Excel_info:
         else:
             # 如果已经存在了
             # 获取储存过的路径
-            path = row_number.loc[0, "path"]
+
+            path = row_number["path"].values[0]
 
             # 打开历史存储的参数
             self.params_df = pd.read_excel(path, index_col=0)
 
             # 撰写新的 data 优先遵从列表导入
+            # TODO BUKONGZHI
+            col_count = self.params_df.shape[1]
             if args:
-                new_data = pd.DataFrame(args, columns=self.params_df.columns)
+                new_len = len(args)
+                non_list = [None for _ in range(col_count - new_len)]
+                new_list = list(args) + non_list
             else:
-                new_data = pd.DataFrame([list(kwargs.values())], columns=self.params_df.columns)
+                new_len = len(list(kwargs.values()))
+                non_list = [None for _ in range(col_count - new_len)]
+                new_list = list(kwargs.values()) + non_list
+
+            new_data = pd.DataFrame([new_list], columns=self.params_df.columns)
+
+            # if args:
+            #     new_data = pd.DataFrame([args], columns=self.params_df.columns)
+            # else:
+            #     new_data = pd.DataFrame([list(kwargs.values())], columns=self.params_df.columns)
             # 合并新旧数据
             self.params_df = pd.concat([self.params_df, new_data], ignore_index=True)
             # 备份旧数据
@@ -159,7 +174,8 @@ class Excel_info:
         else:
             # 如果已经存在了
             # 获取储存过的路径
-            path = row_number.loc[0, "path"]
+            path = row_number["path"].values[0]
+            print(path)
             # 打开历史存储的参数
             self.params_df = pd.read_excel(path, index_col=0)
             return self.params_df
