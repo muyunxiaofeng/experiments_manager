@@ -81,6 +81,17 @@ pipreqs D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\support\  --e
 
 ​	1.完成字母转换为数字的方法alpha_calculator 【2023.11.11】：直接输入字符串即可，如果非英文字母，则会报错！算出来是跟excel列名一致的结果。
 
+2023.12.06
+
+- [x] 需要补充完成输入记录
+- [x] 测试json模式是否生效
+- [x] 增加项目选项
+- [x] 增加保存布板功能
+- [x] 测试布板功能
+- [ ] 数据遍历
+
+
+
 # 更新日志
 
 ## 2023.11.04
@@ -1906,11 +1917,11 @@ print(dict1)  # 输出: {'a': 4, 'b': 5, 'c': 7, 'd': 6, 'e': 8}
 
 ## 2023.11.28
 
-- [ ] 需要补充完成输入记录
-- [ ] 测试json模式是否生效
-- [ ] 增加项目选项
-- [ ] 增加保存布板功能
-- [ ] 测试布板功能
+- [x] 需要补充完成输入记录
+- [x] 测试json模式是否生效
+- [x] 增加项目选项
+- [x] 增加保存布板功能
+- [x] 测试布板功能
 - [ ] 
 
 ```
@@ -2002,3 +2013,25 @@ for i, value in enumerate(values):
 print(df)
 ```
 这段代码首先创建了一个空的DataFrame，然后使用循环逐个填充值，将其他位置用`None`补齐。在循环中，通过`at`方法访问DataFrame的特定位置并赋值。请注意，这里假设列名和值的顺序是对应的。如果实际情况不同，你需要相应地调整代码。
+
+
+
+## 2023.12.06
+
+在读取Excel文件时，如果遇到科学计数法表示的数字，可以使用`pd.read_excel`函数的`float_precision`参数来指定浮点数的精度。
+
+默认情况下，Pandas会将科学计数法表示的数字转换为浮点数，但有时由于Excel单元格的格式问题或其他原因，可能会导致数字的精度丢失或改变。在这种情况下，您可以使用`float_precision`参数来指定浮点数的精度。
+
+以下是一个示例代码，演示如何使用`float_precision`参数来读取Excel文件中的科学计数法表示的数字：
+
+
+```python
+import pandas as pd
+
+# 读取Excel文件
+df = pd.read_excel('data.xlsx', float_precision='high')
+
+# 打印前5行数据
+print(df.head())
+```
+在上面的代码中，`float_precision='high'`指定了高精度的浮点数表示方式，这可以避免精度丢失或改变的问题。您可以根据需要选择不同的精度表示方式，例如`float_precision='round_trip'`表示使用默认的精度设置。

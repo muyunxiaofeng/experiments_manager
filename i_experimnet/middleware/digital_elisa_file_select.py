@@ -21,23 +21,17 @@ from pprint import pprint
 
 import pandas as pd
 
+from i_experimnet.config.middle_ware_config import Digital_elisa_file_select_config as _config
+
 
 class Digital_Elisa_file_select:
     def __init__(self, path=None):
+        if path is None:
+            path = _config.default_path
+
         self.path = path
         self.keyword = "result"
-        self.target_folder_abs_path_list = []
+        # 目标文件夹下的路径及绝对路径
+        
 
-    def folder_handler(self):
-        for root, folder_list, file_list in os.walk(self.path):
-            for file in file_list:
-                file_abs_path = os.path.join(root, file)
-                if self.keyword in file_abs_path:
-                    self.target_folder_abs_path_list.append(file_abs_path)
 
-    def data_washing(self):
-        for target_folder_abs_path in self.target_folder_abs_path_list:
-            if ["xlsx", "excel", "xls"] in target_folder_abs_path:
-                if target_folder_abs_path.split(".")[-1] == "xls":
-                    shutil.copy(target_folder_abs_path, target_folder_abs_path + "x")  # 复制一个文件到一个文件或一个目录
-                    target_folder_abs_path = target_folder_abs_path + "x"
