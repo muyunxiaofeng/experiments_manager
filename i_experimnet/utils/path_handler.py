@@ -17,8 +17,11 @@ folder_walk	文件名
 """
 
 import os
+import re
 
 import pandas as pd
+
+from i_experimnet.config.utils_config import Path_handler_config as _config
 
 
 class Path_handler:
@@ -49,7 +52,13 @@ class Path_handler:
         }
         return pd.DataFrame(new_dic, columns=["path_name", "abs_path"])
 
-    def folder_handler(self, root_path):
+    def folder_handler(self, root_path, keyword=None, files_prefix=None, sep=None):
+        if keyword is None:
+            keyword = _config.keyword
+        if files_prefix is None:
+            files_prefix = _config.filer_prefix
+        if sep is None:
+            sep = _config.sep
         # 重置列表
         self.target_folder_path_name_list = list()
         self.target_folder_abs_path_list = list()
@@ -57,7 +66,7 @@ class Path_handler:
         for root, folder_list, file_list in os.walk(root_path):
             for file in file_list:
                 file_abs_path = os.path.join(root, file)
-                if self.keyword in file_abs_path:
+                if keyword in file_abs_path and files_prefix in file_abs_path:
                     self.target_folder_path_name_list.append(file)
                     self.target_folder_abs_path_list.append(file_abs_path)
         # saving
@@ -66,3 +75,8 @@ class Path_handler:
             "abs_path": self.target_folder_abs_path_list
         }
         self.folder_df = pd.DataFrame(new_dic, columns=["path_name", "abs_path"])
+        # split
+        # sep_df = self.folder_df["path_name"].str.split("_")
+        sep_df = self.folder_df["path_name"].apply(lambda x: re.split("[-_]", x))
+        print(sep_df.head().to_string())
+        print(sep_df.to_string())

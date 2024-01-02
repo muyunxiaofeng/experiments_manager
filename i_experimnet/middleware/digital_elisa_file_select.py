@@ -22,6 +22,7 @@ from pprint import pprint
 import pandas as pd
 
 from i_experimnet.config.middle_ware_config import Digital_elisa_file_select_config as _config
+from i_experimnet.utils.path_handler import Path_handler
 
 
 class Digital_Elisa_file_select:
@@ -30,8 +31,7 @@ class Digital_Elisa_file_select:
             path = _config.default_path
 
         self.path = path
-        self.keyword = "result"
+        # self.keyword = "result"
         # 目标文件夹下的路径及绝对路径
-        
-
-
+        self.path_handler = Path_handler(root=None)
+        self.path_handler.folder_handler(root_path=path)

@@ -21,7 +21,8 @@ from i_experimnet.middleware.digital_elisa_file_select import Digital_Elisa_file
 
 class TestDigital_Elisa_file_select(TestCase):
     # d = Digital_Elisa_file_select("F:/")
-    d = Digital_Elisa_file_select()
-    d.folder_list()
-    print(d.folder_dataframe.to_string())
+    path = r"E:\W20231208"
+    d = Digital_Elisa_file_select(path)
+
+    print(d.path_handler.folder_df.to_string())
 
