@@ -1,1 +1,0 @@
-{"platform": {"0": "digital_Elisa"}}

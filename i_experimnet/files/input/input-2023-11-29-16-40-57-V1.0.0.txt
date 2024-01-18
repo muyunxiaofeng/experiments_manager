@@ -1,1 +1,0 @@
-{"obj.": {"0": "Amyloid Beta 1-40"}, "capture_antibody": {"0": "BY40101"}, "detector_antibody": {"0": "BY42102"}}

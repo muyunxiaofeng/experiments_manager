@@ -1,3 +1,0 @@
-  dilution_name   M1  M1 conc. M1_unit           M2  M2_conc. M2_unit  M3  M3_conc.  M3_unit
-0            *1  BSA       0.5       %  PBS(pH=7.4)      0.02       M NaN       NaN      NaN
-{"dilution_name": {"0": "*2"}, "M1": {"0": "3"}, "M1 conc.": {"0": null}, "M1_unit": {"0": null}, "M2": {"0": null}, "M2_conc.": {"0": null}, "M2_unit": {"0": null}, "M3": {"0": null}, "M3_conc.": {"0": null}, "M3_unit": {"0": null}}
