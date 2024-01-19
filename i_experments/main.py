@@ -15,6 +15,13 @@ frozensword	用户名（指登录电脑的那个用户名）
 19	当前分钟
 59	当前秒钟
 """
+import os
+import sys
+
+# 将根目录放到python解释器中
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from i_experments.bin.Items import Items as item_select
 
 
 def method_function(method_dic):
@@ -31,16 +38,12 @@ def method_function(method_dic):
             return
         if _input.isdecimal() and int(_input) < len(method_dic):
             func = list(method_dic.values())[int(_input)]()
-            if not func:
-                continue
-            if func.upper() == "Q":
-                return "Q"
 
 
 if __name__ == '__main__':
     # 方法的字典
-    method_dic = {
+    method = {
         "选择项目": item_select
     }
     # 方法实现
-    method_function(method_dic=method_dic)
+    method_function(method_dic=method)

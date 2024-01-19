@@ -2035,3 +2035,176 @@ df = pd.read_excel('data.xlsx', float_precision='high')
 print(df.head())
 ```
 在上面的代码中，`float_precision='high'`指定了高精度的浮点数表示方式，这可以避免精度丢失或改变的问题。您可以根据需要选择不同的精度表示方式，例如`float_precision='round_trip'`表示使用默认的精度设置。
+
+### 2024年01月18日
+
+```
+Python使用不同的库来创建Excel文件
+
+Python Developer
+
+于 2023-03-23 11:45:53 发布
+
+阅读量301
+ 收藏 1
+
+点赞数
+文章标签： python excel pandas
+版权
+Python使用不同的库来创建Excel文件
+openpyxl:
+pandas:
+xlwt:
+
+在Python中，可以使用不同的库来创建Excel文件。以下是其中几个流行的库和使用它们创建Excel文件的代码示例：
+openpyxl:
+import openpyxl
+# 创建工作簿
+workbook = openpyxl.Workbook()
+
+# 创建工作表
+worksheet = workbook.active
+
+# 写入数据
+worksheet['A1'] = 'Hello'
+worksheet['B1'] = 'World'
+
+# 保存工作簿
+workbook.save('example.xlsx')
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+pandas:
+import pandas as pd
+
+# 创建数据
+data = {'Name': ['John', 'Jane', 'Bob', 'Mary'],
+        'Age': [25, 30, 35, 40],
+        'City': ['New York', 'Paris', 'London', 'Tokyo']}
+
+# 创建DataFrame
+df = pd.DataFrame(data)
+
+# 保存DataFrame到Excel文件
+df.to_excel('example.xlsx', index=False)
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+当使用 pandas 创建 Excel 文件时，可以使用许多选项来自定义输出，包括指定工作表的名称，数据类型，数字格式等等。以下是使用 pandas 创建 Excel 文件的更详细示例：
+
+import pandas as pd
+
+# 创建数据
+data = {'Name': ['John', 'Jane', 'Bob', 'Mary'],
+        'Age': [25, 30, 35, 40],
+        'City': ['New York', 'Paris', 'London', 'Tokyo']}
+
+# 创建DataFrame
+df = pd.DataFrame(data)
+
+# 创建Excel文件对象
+writer = pd.ExcelWriter('example.xlsx', engine='xlsxwriter')
+
+# 将DataFrame写入工作表
+df.to_excel(writer, sheet_name='Sheet1', index=False)
+
+# 获取工作表对象
+worksheet = writer.sheets['Sheet1']
+
+# 设置单元格格式
+cell_format = writer.book.add_format({'num_format': '$#,##0.00'})
+worksheet.set_column('C:C', None, cell_format)
+
+# 保存工作簿
+writer.save()
+
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+在这个示例中，使用 pd.ExcelWriter 创建了一个 ExcelWriter 对象，它使用了 xlsxwriter 引擎。接下来，使用 to_excel() 方法将 DataFrame 写入名为 Sheet1 的工作表中，并使用 index=False 参数指定不写入行索引。然后，使用 writer.sheets 获取工作表对象并使用 set_column() 方法设置单元格格式，最后使用 writer.save() 保存工作簿。
+
+除了上面示例中的示例之外，pandas 还提供了其他选项，例如：
+
+sheet_name 参数可以用来指定工作表的名称。
+startrow 和 startcol 参数可以用来指定写入数据的起始行和起始列。
+header 参数可以用来指定是否在工作表中写入列标题。
+float_format 参数可以用来指定浮点数格式。
+更多示例和选项，请查看 pandas 文档。
+
+xlwt:
+import xlwt
+
+# 创建工作簿
+workbook = xlwt.Workbook()
+
+# 创建工作表
+worksheet = workbook.add_sheet('Sheet1')
+
+# 写入数据
+worksheet.write(0, 0, 'Hello')
+worksheet.write(0, 1, 'World')
+
+# 保存工作簿
+workbook.save('example.xls')
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+这只是几个例子，Python中还有其他库可以用来创建Excel文件
+————————————————
+版权声明：本文为CSDN博主「Python Developer」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/qzw985/article/details/129727332
+```
+
