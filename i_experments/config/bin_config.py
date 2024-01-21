@@ -39,5 +39,5 @@ class de_info:
     de_sbg_base = ["SBG_LOT", "SBG", "SBG_Conc.", "SBG_Unit", "SBG_Dilution", "SBG_Mfg.", "SBG_volume", "SBG_protocol"]
     de_base = ["Resuspension", "Resuspension_volume", "machine_LOT", "automatic.", "auto_washing"]
     de_calculator = ["positive_beads", "total_beads", "AEB", "positive_ratio", "input_beads", "recycle"]
-    de_all = items_base + de_beads_base + de_CA_base + de_coating_base + de_blocking_base
+    de_all = items_base + de_calculator + de_beads_base + de_CA_base + de_coating_base + de_blocking_base
     de_all += de_Ag_base + de_DA_base + de_sbg_base + de_base

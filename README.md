@@ -97,8 +97,8 @@ pipreqs D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\support\  --e
 
 - [ ] 录入项目
 
-  - [ ] 增
-  - [ ] 删
+  - [x] 增
+  - [x] 删
   - [ ] 改
   - [ ] 查
 
@@ -109,7 +109,7 @@ pipreqs D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\support\  --e
   - [ ] 改
   - [ ] 查
 
-- [ ] 实验记录的
+- [ ] 实验记录的批量
 
   - [ ] 增
   - [ ] 删
