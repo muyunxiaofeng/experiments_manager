@@ -20,6 +20,9 @@ frozensword	用户名（指登录电脑的那个用户名）
 class items_config:
     items_files = "./files/items.xlsx"
     items_name = "items"
+    col_items = "items"
+    col_columns = "columns"
+    col_version = "version"
 
 
 class de_info:

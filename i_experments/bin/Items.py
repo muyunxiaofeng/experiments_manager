@@ -51,28 +51,32 @@ class Items:
             print("没有可用项目")
             flag = False
         else:
-            self.items_file = Loading_excel(_config.items_files)
-            items_list = self.items_file.excel["items"].to_list()
-            print(self.items_file.excel["items"])
+            self.items_file = Loading_excel(_config.items_files).excel
+            items_list = self.items_file["items"].to_list()
+            print(self.items_file["items"])
             flag = True
         # v2.0 允许user新建
         while 1:
-            _input = input("请输入要选择的序号，输入N新建,输入R从头开始写入，只输入Q退出：").strip()
+            _input = input(
+                "请输入要选择的序号，输入N新建,D加序号删除，U加序号更新，输入R从头开始写入，只输入Q退出：").strip()
             if not _input:
                 print("不能输入空值~")
                 continue
             if _input.upper() == "Q":
                 return
             if _input.upper()[0] == "D":
-                if _input.upper()[1:].isdecimal() and int(_input) < len(items_list):
+                if _input.upper()[1:].isdecimal() and int(_input[1:]) < len(items_list):
                     self.del_items(int(_input[1:]))
+            if _input.upper()[0] == "U":
+                if _input.upper()[1:].isdecimal() and int(_input[1:]) < len(items_list):
+                    self.update_items(int(_input[1:]))
             if _input.upper() == "R":
                 self.add_items(flag=False)
             if _input.upper() == "N":
                 self.add_items(flag=True)
-                self.items_file = Loading_excel(_config.items_files)
-                items_list = self.items_file.excel["items"].to_list()
-                print(self.items_file.excel["items"])
+                self.items_file = Loading_excel(_config.items_files).excel
+                items_list = self.items_file["items"].to_list()
+                print(self.items_file["items"])
             if flag and _input.isdecimal() and int(_input) < len(items_list):
                 xx = items_list[int(_input)]
                 print(xx)
@@ -84,7 +88,7 @@ class Items:
         规范用户输入的唯一途径
         :return:
         """
-        items = []
+        items = list()
         while 1:
             _input = input("请输入项目名称，只输入Q退出：").strip()
             if not _input:
@@ -96,20 +100,24 @@ class Items:
             else:
                 items.append(_input)
                 break
-        cols = de_info.items_base
+        # cols = de_info.items_base
+        cols = list()
         while 1:
             _input = input("请输入列名,输入D进入数据库选择，只输入Q退出：").strip()
+            print("_input", _input)
+            print("cols", cols)
             if not _input:
                 print("不能输入空值~")
                 continue
             if _input.upper() == "Q":
                 cols = list(set(cols))
-                print("cols:", cols)
+                print("cols:")
+                pprint.pprint(cols)
                 break
             if _input.upper() == "D":
                 while 1:
                     cols_ref = self.format_dic()
-                    select_cols = Show_dic.show_dic(cols_ref)
+                    _, select_cols = Show_dic.show_iter(cols_ref)
                     if select_cols == "Q":
                         break
                     cols += select_cols
@@ -119,9 +127,9 @@ class Items:
                 continue
 
         _ = {
-            "items": items,
-            "columns": [json.dumps(cols)],
-            "version": [self.version]
+            _config.col_items: items,
+            _config.col_columns: [json.dumps(cols)],
+            _config.col_version: [self.version]
         }
         return _
 
@@ -156,10 +164,27 @@ class Items:
         :return:
         """
         self.items_file = self.items_file.drop(index)
+        self.oe.only_save_df(self.items_file, _config.items_files)
 
-    def update_items(self):
+    def update_items(self, index):
         """
         更改项目
         :return:
         """
-        pass
+        items_columns_col = self.items_file[_config.col_columns]
+        origin_info_df = items_columns_col.iloc[index]
+        info = json.loads(origin_info_df)
+        select_index, _ = Show_dic.show_iter(info)
+        while 1:
+            _input = input("请输入要改的值，只输入Q退出：").strip()
+            if not _input:
+                print("不能输入空值~")
+                continue
+            if _input.upper() == "Q":
+                return
+            else:
+                info[select_index] = _input
+                break
+        self.items_file.loc[index, _config.col_columns] = json.dumps(info)
+        print(self.items_file.loc[index, _config.col_columns])
+        self.oe.only_save_df(self.items_file, _config.items_files)
