@@ -26,4 +26,8 @@ class Loading_excel:
         self.excel = self.load_excel()
 
     def load_excel(self):
+        """
+        读取给定地址的excel 储存在excel中
+        :return:
+        """
         return pd.read_excel(self.excel_path)

@@ -16,17 +16,22 @@ frozensword	用户名（指登录电脑的那个用户名）
 13	当前秒钟
 """
 import json
+import pprint
 import os.path
+from collections.abc import Iterable
 
 import pandas as pd
 
+from i_experments.config.bin_config import de_info
 from i_experments.utils.excel_load import Loading_excel
 from i_experments.utils.output_excel import Output_excel
 from i_experments.config.bin_config import items_config as _config
+from i_experments.utils.show_method_dic import Show_dic
 
 
 class Items:
     def __init__(self):
+        self.items_file = None
         self.version = "V1.0.1"
         print("items")
         # 输出辅助
@@ -35,45 +40,50 @@ class Items:
         self.items_initializing()
 
     def items_initializing(self):
-        if not os.path.exists(_config.items_files):
-            self.create_items()
-        else:
-            items_file = Loading_excel(_config.items_files)
-            items_list = items_file.excel["items"].to_list()
-            print(items_file.excel["items"])
-            # v2.0 允许user新建
-            while 1:
-                _input = input("请输入要选择的序号，输入N新建,输入R从头开始写入，只输入Q退出：").strip()
-                if not _input:
-                    print("不能输入空值~")
-                    continue
-                if _input.upper() == "Q":
-                    return
-                if _input.upper() == "R":
-                    self.create_items()
-                if _input.upper() == "N":
-                    self.add_items()
-                    items_file = Loading_excel(_config.items_files)
-                    items_list = items_file.excel["items"].to_list()
-                    print(items_file.excel["items"])
-                if _input.isdecimal() and int(_input) < len(items_list):
-                    xx = items_list[int(_input)]
-                    print(xx)
-
-    def create_items(self):
         """
-        v1.0
-        创建项目，让用户键入项目，并键入要创建的列，包装成list后转化为json储存到dataframe中
-        v2.0
-        已经保存的项目用户选择已经保存过的列
+        items的界面展示方法
+        v1.1：新增项目
+        v1.2：根据flag确定是否重写items文件
         :return:
         """
-        _ = self.new_items()
-
-        print(_)
-        self.oe.write_a_dic(_, _config.items_files)
+        if not os.path.exists(_config.items_files):
+            items_list = []
+            print("没有可用项目")
+            flag = False
+        else:
+            self.items_file = Loading_excel(_config.items_files)
+            items_list = self.items_file.excel["items"].to_list()
+            print(self.items_file.excel["items"])
+            flag = True
+        # v2.0 允许user新建
+        while 1:
+            _input = input("请输入要选择的序号，输入N新建,输入R从头开始写入，只输入Q退出：").strip()
+            if not _input:
+                print("不能输入空值~")
+                continue
+            if _input.upper() == "Q":
+                return
+            if _input.upper()[0] == "D":
+                if _input.upper()[1:].isdecimal() and int(_input) < len(items_list):
+                    self.del_items(int(_input[1:]))
+            if _input.upper() == "R":
+                self.add_items(flag=False)
+            if _input.upper() == "N":
+                self.add_items(flag=True)
+                self.items_file = Loading_excel(_config.items_files)
+                items_list = self.items_file.excel["items"].to_list()
+                print(self.items_file.excel["items"])
+            if flag and _input.isdecimal() and int(_input) < len(items_list):
+                xx = items_list[int(_input)]
+                print(xx)
 
     def new_items(self):
+        """
+        公共的输入item方法
+        包括新建和新增
+        规范用户输入的唯一途径
+        :return:
+        """
         items = []
         while 1:
             _input = input("请输入项目名称，只输入Q退出：").strip()
@@ -86,35 +96,70 @@ class Items:
             else:
                 items.append(_input)
                 break
-        cols = []
+        cols = de_info.items_base
         while 1:
-            _input = input("请输入列名，只输入Q退出：").strip()
+            _input = input("请输入列名,输入D进入数据库选择，只输入Q退出：").strip()
             if not _input:
                 print("不能输入空值~")
                 continue
             if _input.upper() == "Q":
+                cols = list(set(cols))
                 print("cols:", cols)
                 break
+            if _input.upper() == "D":
+                while 1:
+                    cols_ref = self.format_dic()
+                    select_cols = Show_dic.show_dic(cols_ref)
+                    if select_cols == "Q":
+                        break
+                    cols += select_cols
+                continue
             else:
                 cols.append(_input)
                 continue
-        col = _config.items_base + cols
+
         _ = {
             "items": items,
-            "columns": [json.dumps(col)],
+            "columns": [json.dumps(cols)],
             "version": [self.version]
         }
         return _
 
-    def add_items(self):
-        #
-        old_items = Loading_excel(_config.items_files).excel
-        new_item = self.new_items()
-        # 拼接
-        self.oe.add_a_record(old_items, new_item, _config.items_files)
+    @staticmethod
+    def format_dic():
+        cols_default = dict(de_info.__dict__)
+        cols_dic = dict()
+        for k in cols_default:
+            if isinstance(cols_default[k], Iterable):
+                cols_dic[k] = cols_default[k]
 
-    def del_items(self):
-        pass
+        return cols_dic
+
+    def add_items(self, flag):
+        """
+        增加项目
+        :param flag: 如果是flase 就重写
+        :return:
+        """
+        if not os.path.exists(_config.items_files) or not flag:
+            new_item = self.new_items()
+            self.oe.write_a_dic(new_item, _config.items_files)
+        else:
+            old_items = Loading_excel(_config.items_files).excel
+            new_item = self.new_items()
+            # 拼接
+            self.oe.add_a_record(old_items, new_item, _config.items_files)
+
+    def del_items(self, index):
+        """
+        删除项目
+        :return:
+        """
+        self.items_file = self.items_file.drop(index)
 
     def update_items(self):
+        """
+        更改项目
+        :return:
+        """
         pass

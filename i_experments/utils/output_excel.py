@@ -24,16 +24,27 @@ class Output_excel:
 
     @staticmethod
     def write_a_dic(dic, o_path):
+        """
+        给定一个dataframe格式的字典就可以打包成一个excel的方法
+        :param dic: 字典
+        :param o_path: 数据地址
+        :return:
+        """
         df = pd.DataFrame(dic)
         df.to_excel(o_path, index=True)
 
     @staticmethod
     def add_a_record(df1, dic2, o_path):
+        """
+        给原有df中加入一条数据，
+        :param df1: 原有df
+        :param dic2: 新数据
+        :param o_path: 数据地址
+        :return:
+        """
         # df1 = pd.DataFrame(dic1)
         df2 = pd.DataFrame(dic2)
         df = pd.concat([df1, df2])
         df.to_excel(o_path, index=True)
 
-    @staticmethod
-    def add_a_column(df1,col,o_path):
-        pass
+
