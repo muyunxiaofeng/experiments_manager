@@ -78,8 +78,10 @@ class Items:
                 items_list = self.items_file["items"].to_list()
                 print(self.items_file["items"])
             if flag and _input.isdecimal() and int(_input) < len(items_list):
-                xx = items_list[int(_input)]
-                print(xx)
+                select_item = items_list[int(_input)]
+                print(select_item)
+                item_info = self.items_file[self.items_file[_config.col_items] == select_item]
+                pprint.pprint(item_info.to_string(index=False))
 
     def new_items(self):
         """

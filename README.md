@@ -99,8 +99,8 @@ pipreqs D:\OneDrive\201.python\pythonWorkSpace\experiments_manager\support\  --e
 
   - [x] 增
   - [x] 删
-  - [ ] 改
-  - [ ] 查
+  - [x] 改
+  - [x] 查
 
 - [ ] 设计项目
 
