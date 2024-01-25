@@ -14,18 +14,52 @@ frozensword	用户名（指登录电脑的那个用户名）
 01	当前小时
 34	当前分钟
 29	当前秒钟
+
+1.
 """
 import os
+import re
 import shutil
+
+from i_experments.config.src_config import De_data_cornfig as _config
 
 
 class De_data:
     def __init__(self):
-        path = "/Volumes/找幻影/2023-12-20 183554 实验1w5455/W54-7/result-20231220-1843"
-        pass
+        self.version = "de_data_V1.0.0"
+        # path = "/Users/frozensword/Downloads/SQL必知必会/副本Excel-1-7-20231227-1522.xlsx"
+        self.path = "/Volumes"
+
+
+
+    @staticmethod
+    def xls_to_xlsx(xls_path):
+        if xls_path.endswith(".xls"):
+            new_path = xls_path + "x"
+            shutil.copy(xls_path, new_path)
+            return new_path
+        return xls_path
+
+    @staticmethod
+    def find_result(folder_path):
+        re_list = re.findall(_config.result_re, folder_path)[0]
+        return re_list
+
+    @staticmethod
+    def result_walk(root_path):
+        for root, folder_list, file_list in os.walk(root_path):
+            for file in file_list:
+                file_abs_path = os.path.join(root, file)
+                print(file)
+                print(file_abs_path)
 
 
 if __name__ == '__main__':
-    path = "/Volumes/找幻影/2023-12-20 183554 实验1w5455/W54-7/result-20231220-1843"
-    path = "/"
-    print(os.listdir(path))
+    # path = "/Volumes/找幻影/2023-12-20 183554 实验1w5455/W54-7/result-20231220-1843"
+    path = "/Volumes"
+    # path = "/"
+    # path = "/Users/frozensword/Downloads/SQL必知必会/副本Excel-1-7-20231227-1522.xlsx"
+    # path = "/Users/frozensword/Downloads/SQL必知必会"
+    # print(os.listdir(path))
+    # print(De_data.find_result(folder_path=path))
+    De_data.result_walk(root_path=path)

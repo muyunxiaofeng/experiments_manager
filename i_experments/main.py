@@ -22,6 +22,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from i_experments.bin.Items import Items as item_select
+from i_experments.bin.Organize_data import Organize_data as organize_data
 
 
 def method_function(method_dic):
@@ -43,7 +44,8 @@ def method_function(method_dic):
 if __name__ == '__main__':
     # 方法的字典
     method = {
-        "选择项目": item_select
+        "选择项目": item_select,
+        "整理数据": organize_data
     }
     # 方法实现
     method_function(method_dic=method)
