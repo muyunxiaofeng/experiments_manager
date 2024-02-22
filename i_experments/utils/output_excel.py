@@ -44,7 +44,6 @@ class Output_excel:
         """
         # df1 = pd.DataFrame(dic1)
         df2 = pd.DataFrame(dic2)
-
         df = pd.concat([df1, df2])
         df.to_excel(o_path, index=False)
 

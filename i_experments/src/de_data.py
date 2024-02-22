@@ -17,49 +17,76 @@ frozensword	用户名（指登录电脑的那个用户名）
 
 1.
 """
+import concurrent.futures
 import os
 import re
 import shutil
 
-from i_experments.config.src_config import De_data_cornfig as _config
+import pandas
+import pandas as pd
+
+from i_experments.config.src_config import De_data_config as _config
+from i_experments.utils.threading_safe_list import ThreadSafeList
 
 
 class De_data:
-    def __init__(self):
+    def __init__(self, final_path):
         self.version = "de_data_V1.0.0"
         # path = "/Users/frozensword/Downloads/SQL必知必会/副本Excel-1-7-20231227-1522.xlsx"
         self.path = "/Volumes"
+        self.final_path = final_path
+        self.result_list = list()
+        self.result_walk(self.final_path)
+        print(self.result_list)
+        # 要处理的xlsx
+        self.handle_xlsx = ThreadSafeList()
+        self.collect_xlsx()
+        # test read xlsx
+        excel = pd.read_excel(self.handle_xlsx.get()[0])
+        print(excel)
+        yx = excel[excel["图片编号"] == "有效图合计"]
+        print(yx)
+        # todo
+        # yx_list = yx.to_list()
+        # # print(yx_list)
+        # yxl = yx.to
+        # print(yxl)
+        yx_dic = yx.to_dict()
+        print(yx_dic)
+        ygs = excel["荧光数"]
+        print(ygs)
+        numpy_ygs = ygs.to_numpy()
+        sumygs = numpy_ygs.sum()
+        print(sumygs)
 
 
+    def collect_xlsx(self):
+        """
+        多线程的查找xlsl
+        :return:
+        """
+        with concurrent.futures.ThreadPoolExecutor(os.cpu_count()) as executor:
+            futures = {executor.submit(self.only_excel, future) for future in self.result_list}
+            completed, pending = concurrent.futures.wait(futures)
+            print(completed)
+            print(pending)
+            for future in concurrent.futures.as_completed(futures):
+                print(future.result())
+        print("self.handle_xlsx", self.handle_xlsx.get())
 
-    @staticmethod
-    def xls_to_xlsx(xls_path):
-        if xls_path.endswith(".xls"):
-            new_path = xls_path + "x"
-            shutil.copy(xls_path, new_path)
-            return new_path
-        return xls_path
-
-    @staticmethod
-    def find_result(folder_path):
-        re_list = re.findall(_config.result_re, folder_path)[0]
-        return re_list
-
-    @staticmethod
-    def result_walk(root_path):
+    def result_walk(self, root_path):
+        """
+        根据config中的result。re进行查找目标文件夹下的文件
+        :param root_path:
+        :return:
+        """
         for root, folder_list, file_list in os.walk(root_path):
             for file in file_list:
                 file_abs_path = os.path.join(root, file)
-                print(file)
-                print(file_abs_path)
+                if re.findall(_config.result_re, file_abs_path):
+                    self.result_list.append(file_abs_path)
 
-
-if __name__ == '__main__':
-    # path = "/Volumes/找幻影/2023-12-20 183554 实验1w5455/W54-7/result-20231220-1843"
-    path = "/Volumes"
-    # path = "/"
-    # path = "/Users/frozensword/Downloads/SQL必知必会/副本Excel-1-7-20231227-1522.xlsx"
-    # path = "/Users/frozensword/Downloads/SQL必知必会"
-    # print(os.listdir(path))
-    # print(De_data.find_result(folder_path=path))
-    De_data.result_walk(root_path=path)
+    def only_excel(self, _path):
+        if _path.endswith(".xls") or _path.endswith(".xlsx"):
+            self.handle_xlsx.add(_path)
+            return "chengong"

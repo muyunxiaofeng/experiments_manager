@@ -15,11 +15,38 @@ frozensword	用户名（指登录电脑的那个用户名）
 05	当前分钟
 21	当前秒钟
 """
+import os
+
+from i_experments.bin.Items import Items
+from i_experments.src.de_data import De_data
+from i_experments.utils.show_method_dic import Show_dic
+from i_experments.config.bin_config import organize_data_config as _config
 
 
 class Organize_data:
     def __init__(self):
-        pass
+        self.final_path = None
+        print("Organize_data")
+        self.version = "Organize_data V1.0.0"
+        self.items = Items(instance=True)
+        self.platform_func_dic = _config.platform_func
+        self.organize_guide()
 
     def organize_guide(self):
-        pass
+        # select path
+        self.select_path(_config.volumes_path)
+        # select platform
+        self.items.platform_initializing()
+        # select items
+        self.items.items_initializing()
+        print(self.items.item_info)
+        # 文件整理
+        self.platform_func_dic[self.items.platform](self.final_path)
+
+    def select_path(self, _path):
+        num, value = Show_dic.show_iter(os.listdir(_path))
+        if value == "Q":
+            self.final_path = _path
+            return
+        final_path = os.path.join(*[_path, value])
+        self.select_path(final_path)

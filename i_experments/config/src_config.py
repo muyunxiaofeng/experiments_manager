@@ -17,5 +17,7 @@ frozensword	用户名（指登录电脑的那个用户名）
 """
 
 
-class De_data_cornfig:
+class De_data_config:
     result_re = ".*result.*"
+    _files = "./files/platforms.xlsx"
+    volumes_path = "/Volumes"

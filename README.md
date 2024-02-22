@@ -2066,7 +2066,7 @@ print(df.head())
 ```
 在上面的代码中，`float_precision='high'`指定了高精度的浮点数表示方式，这可以避免精度丢失或改变的问题。您可以根据需要选择不同的精度表示方式，例如`float_precision='round_trip'`表示使用默认的精度设置。
 
-### 2024年01月18日
+## 2024年01月18日
 
 ```
 Python使用不同的库来创建Excel文件
@@ -2318,4 +2318,193 @@ print(df)
 df = df[df['Name'] != 'Bob']
 ```
 这里，`df['Name'] != 'Bob'`会返回一个布尔序列，其中为True的位置表示'Name'列中的值不是'Bob'。然后，这个布尔序列被用来从原始DataFrame中选择行。
+
+
+
+### 2024年01月26日
+
+在Python中，我们可以使用`multiprocessing`库实现多进程，使用`concurrent.futures`库实现线程池。但是，需要注意的是，多进程和线程池不能直接嵌套使用，因为它们都涉及到并发执行任务，而Python的GIL（全局解释器锁）限制了同一时间只能有一个线程在执行Python字节码。
+
+然而，我们可以创建一个多进程，每个进程内部都有一个线程池。这样，每个进程都有自己的GIL，可以并行执行任务。
+
+以下是一个示例代码，它创建了一个多进程，每个进程内部都有一个线程池，线程池中的线程执行一个函数，该函数的参数个数大于3个。
+
+
+```python
+import multiprocessing
+import concurrent.futures
+
+def func(arg1, arg2, arg3, arg4):
+    print(f"Thread {arg1} is running, args: {arg1}, {arg2}, {arg3}, {arg4}")
+    # Do something...
+
+def main():
+    # 创建多进程
+    processes = []
+    for i in range(multiprocessing.cpu_count()):
+        p = multiprocessing.Process(target=worker)
+        p.start()
+        processes.append(p)
+    for p in processes:
+        p.join()
+
+def worker():
+    # 创建线程池
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # 提交任务到线程池
+        futures = [executor.submit(func, i, 'arg2', 'arg3', 'arg4') for i in range(5)]
+        for future in concurrent.futures.as_completed(futures):
+            print(f"Future {future.result()} has completed")
+
+if __name__ == '__main__':
+    main()
+```
+在这个示例中，我们创建了一个名为`func`的函数，它接受4个参数。然后我们创建了一个名为`main`的主函数，它创建了与CPU核数相同的进程数，每个进程都调用名为`worker`的工作函数。在`worker`函数中，我们创建了一个线程如果您想创建一个多进程池，每个进程池内部都有一个线程池，可以使用Python的`multiprocessing`和`concurrent.futures`库来实现。以下是一个示例代码，演示了如何创建多个进程，每个进程内部都有一个线程池，线程池中的线程执行一个函数，该函数的参数个数大于3个：
+
+
+```python
+import multiprocessing
+import concurrent.futures
+
+def func(arg1, arg2, arg3, arg4):
+    print(f"Thread {arg1} is running, args: {arg1}, {arg2}, {arg3}, {arg4}")
+    # Do something...
+
+def worker(process_pool):
+    # 创建线程池
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        # 提交任务到线程池
+        futures = [executor.submit(func, i, 'arg2', 'arg3', 'arg4') for i in range(5)]
+        for future in concurrent.futures.as_completed(futures):
+            print(f"Future {future.result()} has completed")
+
+if __name__ == '__main__':
+    # 创建进程池
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as process_pool:
+        process_pool.map(worker, range(multiprocessing.cpu_count()))
+```
+在这个示例中，我们首先定义了`func`函数，它接受4个参数。然后我们定义了`worker`函数，它接受一个进程池对象作为参数。在`worker`函数中，我们创建了一个线程池，并向线程池提交了5个任务。每个任务都是调用`func`函数，并传入不同的参数。最后，我们使用`as_completed`方法等待所有任务完成。
+
+在主函数中，我们使用`multiprocessing.Pool`创建了一个进程池，进程池的大小与CPU核数相同。然后，我们使用`process_pool.map`方法将`worker`函数映射到每个进程上，从而在每个进程中创建一个线程池。这样，我们就创建了一个多进程池，每个进程内部都有一个线程池，线程池中的线程执行一个函数，该函数的参数个数大于3个。池，并向线程池提交了5个任务。每个任务都是调用`func`函数，并传入不同的参数。最后，我们使用`as_completed`方法等待所有任务完成。
+
+## 2024年02月02日
+
+`itertools.chain` 是 Python 标准库中 `itertools` 模块的一个函数，用于将多个可迭代对象（如列表、元组、集合等）连接成一个可迭代对象。
+
+它的常见用途是当你有一系列需要按顺序遍历的可迭代对象时，你可以使用 `itertools.chain` 将它们连接起来，然后使用一个循环来遍历所有的元素。
+
+使用方法：
+
+
+```python
+from itertools import chain
+
+# 假设你有两个列表
+list1 = [1, 2, 3]
+list2 = [4, 5, 6]
+
+# 使用 itertools.chain 将它们连接起来
+chained_iter = chain(list1, list2)
+
+# 现在你可以遍历这个连接的可迭代对象
+for element in chained_iter:
+    print(element)
+```
+输出：
+
+
+```
+1
+2
+3
+4
+5
+6
+```
+itertools.chain` 可以接受任意数量的可迭代对象作为参数，并将它们全部连接在一起。此外，它返回的是一个惰性迭代器，这意味着只有在迭代时才会计算下一个元素。这意味着 `itertools.chain` 对于大数据集特别有用，因为它可以节省内存。
+
+
+
+`tqdm` 是一个快速、可扩展的 Python 进度条库，可以在 Python 长循环中添加一个进度提示信息，用户只需要封装任意的迭代器 `tqdm(iterator)`。
+
+`from tqdm import tqdm` 这行代码的意思是从 `tqdm` 模块中导入 `tqdm` 类。这样，你就可以在你的代码中使用 `tqdm` 来创建进度条了。
+
+下面是一个简单的例子，展示了如何使用 `tqdm` 来为一个列表的迭代添加进度条：
+
+```python
+from tqdm import tqdm
+import time
+
+# 创建一个列表
+my_list = range(100)
+
+# 使用 tqdm 封装列表的迭代器
+for i in tqdm(my_list):
+    # 模拟一些处理时间
+    time.sleep(0.01)
+    # 这里可以做一些其他的事情
+    pass
+```
+
+运行这段代码，你会看到一个进度条在终端中逐渐填充，表示迭代的进度。这对于估计长时间运行的任务的剩余时间非常有用。
+
+`tqdm` 还有很多其他功能和参数，可以用来定制进度条的外观和行为。例如，你可以设置进度条的总长度、更新频率、添加描述文字等。具体的使用方法可以查看 `tqdm` 的官方文档或在线教程。
+
+
+
+`from typing import List` 是 Python 的类型注解的一部分。
+
+在 Python 3.5 之后，Python 引入了类型提示（type hints）的功能，这允许开发者为函数、方法、类等指定预期的类型。这些类型提示主要用于提供给开发者关于如何使用某个函数或方法的提示，并且也可以在某些静态类型检查工具（如 `mypy`）中用于检查代码的类型。
+
+`List` 是 Python 标准库 `typing` 中的一个类型提示，用于表示一个列表（list）。使用 `from typing import List` 之后，你就可以在你的代码中写 `List[T]` 来表示一个元素类型为 `T` 的列表。
+
+例如：
+
+
+```python
+from typing import List
+
+def greet_names(names: List[str]) -> None:
+    for name in names:
+        print(f"Hello, {name}!")
+```
+在这个例子中，`names` 参数应该是一个字符串列表，函数内部遍历这个列表并对每个名字进行打印。如果你尝试传入一个非字符串列表，使用如 `mypy` 的工具进行类型检查时就会报错。
+
+注意：虽然类型提示在静态类型检查时非常有用，但 Python 本身是动态类型的语言，所以这些注解不会在运行时强制执行。也就是说，即使你为函数或方法提供了类型提示，Python 仍然可以传入任何类型的参数。
+
+```python
+ @staticmethod
+    def xls_to_xlsx(xls_path):
+        if os.path.isdir(xls_path):
+            for _path in os.listdir(xls_path):
+                if _path.endswith(".xls"):
+                    new_path = _path + "x"
+                    try:
+                        shutil.copy(_path, new_path)
+                    except IOError:
+                        # os.chmod(_path, 777)  # ?? still can raise exception
+                        os.rename(_path, new_path)
+                        # import pandas as pd
+                        # # 读取txt文件，使用“：”和“，”作为分隔符
+                        # df = pd.read_csv('data.txt', sep=r'(?<!:),|(?<=,)(?=:)')
+                        # # 显示前5行数据
+                        # print(df.head())
+                    return new_path
+                elif _path.endswith(".xlsx"):
+                    return _path
+        else:
+            if xls_path.endswith(".xls"):
+                new_path = xls_path + "x"
+                try:
+                    shutil.copy(xls_path, new_path)
+                except IOError:
+                    # os.chmod(xls_path, 777)  # ?? still can raise exception
+                    # shutil.copy(xls_path, new_path)
+                    os.rename(xls_path, new_path)
+
+                return new_path
+            elif xls_path.endswith(".xlsx"):
+                return xls_path
+
+```
 

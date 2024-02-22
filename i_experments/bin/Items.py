@@ -24,27 +24,31 @@ import pandas as pd
 
 from i_experments.config.bin_config import de_info
 from i_experments.utils.excel_load import Loading_excel
+from i_experments.utils.show_method_dic import Show_dic
 from i_experments.utils.output_excel import Output_excel
 from i_experments.config.bin_config import items_config as _config
-from i_experments.utils.show_method_dic import Show_dic
 
 
 class Items:
-    def __init__(self):
+    def __init__(self, instance=False):
+        self.item_info = None
         self.platforms_file = "None"
         self.items_file = None
+        self.platform = None
         """
         v1.0.1: 项目的增删改查
-        V1.0.2: 平台的增删改查
+        V1.0.2: 平台的增删查 不提供改
+        V1.0.3: all会显示所有平台的项目
         """
-        self.version = "V1.0.2"
+        self.version = "Items V1.0.3"
         print("items")
         # 输出辅助
         self.oe = Output_excel()
-        # platform
-        self.platform = self.platform_initializing()
-        # 初始化items文件
-        self.items_initializing()
+        if instance is False:
+            # platform
+            self.platform_initializing()
+            # 初始化items文件
+            self.items_initializing()
 
     def platform_initializing(self):
         """
@@ -87,6 +91,7 @@ class Items:
             if flag and _input.isdecimal() and int(_input) < len(platform_list):
                 select_platform = platform_list[int(_input)]
                 print(select_platform)
+                self.platform = select_platform
                 return select_platform
 
     def items_initializing(self):
@@ -132,13 +137,19 @@ class Items:
                 select_item = items_list[int(_input)]
                 print(select_item)
                 item_info = self.items_file[self.items_file[_config.col_items] == select_item]
+                self.item_info = item_info
                 pprint.pprint(item_info.to_string(index=False))
             flag = True
             self.select_items()
 
     def select_items(self):
+        """
+        v1.0.2 只显示与平台一致的
+        :return:
+        """
         self.items_file = Loading_excel(_config.items_files).excel
-        self.items_file = self.items_file[self.items_file[_config.col_platforms] == self.platform]
+        if self.platform != _config.all_platform:
+            self.items_file = self.items_file[self.items_file[_config.col_platforms] == self.platform]
         items_list = self.items_file[_config.col_items].to_list()
         print(self.items_file[_config.col_items])
         return items_list
