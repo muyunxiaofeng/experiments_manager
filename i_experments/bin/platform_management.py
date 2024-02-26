@@ -36,6 +36,7 @@ class Platform_management:
             "增加参数": self.add_para,
             "删除参数": self.del_para,
             "修改参数": self.update_para,
+            "查看参数": self.select_para,
         }
         # 需要你修改的值的列表
         self.para_LTS = lts()
@@ -144,7 +145,19 @@ class Platform_management:
         self.renew_plate_file()
         return "Q"
 
+    def select_para(self):
+        self.show_iter()
+        return "Q"
+
     def renew_plate_file(self):
+        old_record = self.platform_file.iloc[self.platform_row]
+        # 新版本
         self.platform_file.loc[self.platform_row, _config.parameter_name] = self.para_LTS.to_str
+        self.platform_file.loc[self.platform_row, _config.version_name] += 1
+
+        # 旧版本管理
+        new_df = pd.DataFrame([old_record])
+        new_df.index = new_df.index + self.platform_file.index[-1] + 1  # 设置新记录的索引
+        self.platform_file = pd.concat([self.platform_file, new_df])
         self.platform_file.to_csv(self.platform_path, sep="\t", index=False)
         # todo 更新所有附属表 放这比较合适
