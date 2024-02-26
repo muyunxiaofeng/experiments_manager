@@ -90,3 +90,8 @@ class De_data:
         if _path.endswith(".xls") or _path.endswith(".xlsx"):
             self.handle_xlsx.add(_path)
             return "chengong"
+
+
+class De_data_collector:
+    def __init__(self):
+       pass
