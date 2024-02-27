@@ -35,9 +35,14 @@ class De_data:
         # path = "/Users/frozensword/Downloads/SQL必知必会/副本Excel-1-7-20231227-1522.xlsx"
         self.path = "/Volumes"
         self.final_path = final_path
+
+        # 收集info
+        self.info = None
+
         self.result_list = list()
         self.result_walk(self.final_path)
         print(self.result_list)
+
         # 要处理的xlsx
         self.handle_xlsx = ThreadSafeList()
         self.collect_xlsx()
@@ -58,7 +63,6 @@ class De_data:
         numpy_ygs = ygs.to_numpy()
         sumygs = numpy_ygs.sum()
         print(sumygs)
-
 
     def collect_xlsx(self):
         """
@@ -85,6 +89,8 @@ class De_data:
                 file_abs_path = os.path.join(root, file)
                 if re.findall(_config.result_re, file_abs_path):
                     self.result_list.append(file_abs_path)
+                if re.findall(_config.info_csv_re, file_abs_path):
+                    self.info = file_abs_path
 
     def only_excel(self, _path):
         if _path.endswith(".xls") or _path.endswith(".xlsx"):
@@ -94,4 +100,4 @@ class De_data:
 
 class De_data_collector:
     def __init__(self):
-       pass
+        pass

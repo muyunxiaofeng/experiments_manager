@@ -35,18 +35,19 @@ class Organize_data:
     def organize_guide(self):
         # select path
         self.select_path(_config.volumes_path)
-        # select platform
-        self.items.platform_initializing()
-        # select items
-        self.items.items_initializing()
-        print(self.items.item_info)
+        # # select platform
+        # self.items.platform_initializing()
+        # # select items
+        # self.items.items_initializing()
+        # print(self.items.item_info)
+        index, platform_name = Show_dic().show_iter(self.platform_func_dic)
         # 文件整理
-        self.platform_func_dic[self.items.platform](self.final_path)
+        platform_name(self.final_path)
 
     def select_path(self, _path):
         num, value = Show_dic.show_iter(os.listdir(_path))
         if value == "Q":
             self.final_path = _path
             return
-        final_path = os.path.join(*[_path, value])
+        final_path = os.path.join(_path, value)
         self.select_path(final_path)

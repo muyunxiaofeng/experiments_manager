@@ -17,12 +17,15 @@ frozensword	用户名（指登录电脑的那个用户名）
 """
 
 
-class para_date:
+class para_items_base:
     def __init__(self):
+
         pass
 
-    def A_date_Format(self):
-        pass
+    @property
+    def common_date(self):
+        return datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
-    def date_other_Format(self):
-        pass
+    @property
+    def common_user(self):
+        return

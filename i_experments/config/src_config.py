@@ -21,3 +21,4 @@ class De_data_config:
     result_re = ".*result.*"
     _files = "./files/platforms.xlsx"
     volumes_path = "/Volumes"
+    info_csv_re = ".*info.csv"

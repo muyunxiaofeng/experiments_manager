@@ -21,9 +21,10 @@ import sys
 # 将根目录放到python解释器中
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from i_experments.bin.platform_management import Platform_management as para_management
+from i_experments.bin.platform_management import Platform_management as platform_management
 from i_experments.bin.Items import Items as item_select
 from i_experments.bin.Organize_data import Organize_data as organize_data
+from i_experments.bin.info_out import Info_out as info_out
 
 
 def method_function(method_dic):
@@ -45,9 +46,10 @@ def method_function(method_dic):
 if __name__ == '__main__':
     # 方法的字典
     method = {
-        "平台管理": para_management,
+        "平台管理": platform_management,
         "选择项目、、会被删掉": item_select,
-        "整理数据": organize_data
+        "整理数据": organize_data,
+        "信息输出": info_out
     }
     # 方法实现
     method_function(method_dic=method)

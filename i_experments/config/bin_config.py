@@ -26,7 +26,8 @@ class platform_config:
 
     items_base = ["date", "user", "platform", "items", "version"]
 
-    de_beads_base = ["Beads_LOT", "Beads", "Beads_Conc.", "Beads_Unit", "Beads_Dilution", "Beads_Mfg.", "Beads_volume"]
+    de_beads_base = ["Beads_LOT", "Beads", "Beads_Conc.", "Beads_Unit", "Beads_Dilution", "Beads_Mfg.",
+                     "Beads_input_volume", "Beads_input_unit"]
     de_CA_base = ["CA_LOT", "CA", "CA_Conc.", "CA_Unit", "CA_Weight", "CA_Dilution", "CA_Mfg.", "CA_volume"]
     de_coating_base = ["before_Active_washing", "before_washing_buffer", "before_washing_times",
                        "before_washing_protocol"
@@ -40,9 +41,9 @@ class platform_config:
     de_sbg_base = ["SBG_LOT", "SBG", "SBG_Conc.", "SBG_Unit", "SBG_Dilution", "SBG_Mfg.", "SBG_volume", "SBG_protocol"]
     de_base = ["Resuspension", "Resuspension_volume", "machine_LOT", "automatic.", "auto_washing", "file_path"]
     de_calculator = ["positive_beads", "total_beads", "AEB", "positive_ratio", "input_beads", "recycle"]
-    de_error_base = ["effective_pictures", "AEB_STD", "AEB_CV%", "extract_version"]
+    de_error_base = ["effective_pictures", "AEB_STD", "AEB_CV%", "extract_version","adf"]
     de_all = items_base + de_calculator + de_beads_base + de_CA_base + de_coating_base + de_blocking_base
-    de_all += de_Ag_base + de_DA_base + de_sbg_base + de_base + de_calculator + de_error_base
+    de_all += de_Ag_base + de_DA_base + de_sbg_base + de_base + de_error_base
 
 
 class items_config:
@@ -72,10 +73,11 @@ class de_info:
     de_DA_base = ["DA_LOT", "DA", "DA_Conc.", "DA_Unit", "DA_Dilution", "DA_Mfg.", "DA_volume", "DA_protocol"]
     de_sbg_base = ["SBG_LOT", "SBG", "SBG_Conc.", "SBG_Unit", "SBG_Dilution", "SBG_Mfg.", "SBG_volume", "SBG_protocol"]
     de_base = ["Resuspension", "Resuspension_volume", "machine_LOT", "automatic.", "auto_washing", "file_path"]
+    de_beads_count = ["count_beads_volume","count_dilution_volume", "count_beads_result_conc."]
     de_calculator = ["positive_beads", "total_beads", "AEB", "positive_ratio", "input_beads", "recycle"]
     de_error_base = ["effective_pictures", "AEB_STD", "AEB_CV%", "extract_version"]
-    de_all = items_base + de_calculator + de_beads_base + de_CA_base + de_coating_base + de_blocking_base
-    de_all += de_Ag_base + de_DA_base + de_sbg_base + de_base
+    de_all = items_base + de_calculator + de_beads_base + de_beads_count + de_CA_base + de_coating_base
+    de_all += de_blocking_base + de_Ag_base + de_DA_base + de_sbg_base + de_base
 
 
 class platform_info:
@@ -97,3 +99,7 @@ class organize_data_config:
         "Digital_Elisa": De_data,
         "qRT_PCR": "De_data",
     }
+
+
+class info_out_config:
+    de_info_out_path = "./files/de_info.csv"
