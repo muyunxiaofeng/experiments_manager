@@ -20,6 +20,7 @@ import os.path
 import pandas as pd
 
 from i_experments.config.bin_config import platform_config as _config
+from i_experments.config.bin_config import de_info
 from i_experments.utils.list_str_clazz import List_Str_clazz as lts
 
 
@@ -59,7 +60,7 @@ class Platform_management:
         else:
             with open(self.platform_path, mode="w", encoding="utf-8") as wr:
                 wr.write(f"{_config.platform_name}\t{_config.parameter_name}\t{_config.version_name}\n")
-                wr.write(f"Digital_Elisa\t{';'.join(_config.de_all)}\t1.0\n")
+                wr.write(f"Digital_Elisa\t{';'.join(de_info.de_all)}\t1.0\n")
         self.platform_file = pd.read_csv(self.platform_path, sep="\t")
 
     def platform_change(self):

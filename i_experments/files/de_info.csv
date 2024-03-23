@@ -15,7 +15,8 @@ Beads_Conc.
 Beads_Unit
 Beads_Dilution
 Beads_Mfg.
-Beads_volume
+Beads_input_volume
+Beads_input_unit
 count_beads_volume
 count_dilution_volume
 count_beads_result_conc.
@@ -45,6 +46,8 @@ after_washing_buffer
 after_washing_times
 after_washing_protocol
 storage_buffer
+working_beads_lot
+working_beads_input_volume
 Ag_LOT
 Ag
 Ag_Conc.
